@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>bacalagii — Social Reading Tracker & Notes</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif']
+          },
+          colors: {
+            brand: { 50: '#eff6ff', 100: '#dbeafe', 400: '#60a5fa', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8' },
+            bronze: { 400: '#e38e5b', 500: '#c97341' },
+            cocoa: { bg: '#120e0c', header: '#191310', card: '#211a15', cardHover: '#2a221c', border: '#3a2d25', input: '#16110e', muted: '#a5978e', text: '#f7f3f0', subtle: '#75655b' }
+          }
+        }
+      }
+    };
+  </script>
+</head>
+<body class="bg-cocoa-bg text-cocoa-text font-sans min-h-screen pb-20 antialiased selection:bg-brand-600 selection:text-white">
+
+  <!-- NAVBAR -->
+  <header class="sticky top-0 z-40 backdrop-blur-md bg-cocoa-header/85 border-b border-cocoa-border">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-600 via-brand-700 to-bronze-500 flex items-center justify-center text-white shadow-lg shadow-brand-600/20">
+          <i data-lucide="book-open-check" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <h1 class="font-extrabold text-lg tracking-tight text-cocoa-text leading-none">bacalagii</h1>
+          <p class="text-[11px] text-cocoa-muted mt-0.5 font-medium">One book, one step closer</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2 sm:gap-3 flex-wrap justify-end">
+        <!-- CUSTOM YEAR FILTER DROPDOWN -->
+        <div class="relative" id="year-dropdown-container">
+          <button type="button" onclick="toggleYearDropdown(event)" class="flex items-center gap-1.5 bg-cocoa-card border border-cocoa-border rounded-xl px-2.5 py-1.5 shadow-sm text-xs font-semibold text-cocoa-text hover:border-brand-500/50 transition">
+            <i data-lucide="calendar" class="w-3.5 h-3.5 text-cocoa-muted"></i>
+            <span id="selected-year-label">Year 2026</span>
+            <i data-lucide="chevron-down" class="w-3 h-3 text-cocoa-muted ml-0.5"></i>
+          </button>
+          <div id="year-dropdown-menu" class="hidden absolute top-full mt-2 left-0 sm:right-0 sm:left-auto z-50 w-60 bg-cocoa-card border border-cocoa-border rounded-2xl shadow-2xl p-2.5 backdrop-blur-lg">
+            <div class="mb-2">
+              <label class="block text-[10px] font-semibold text-cocoa-muted mb-1 px-1">Custom Year</label>
+              <div class="flex gap-1">
+                <input type="number" id="custom-year-input" placeholder="e.g. 2028, 2030..." class="w-full px-2.5 py-1.5 text-xs bg-cocoa-input border border-cocoa-border rounded-lg text-cocoa-text focus:outline-none focus:ring-1 focus:ring-brand-500">
+                <button type="button" onclick="applyCustomYear()" class="px-2.5 py-1.5 text-xs font-bold bg-brand-600 hover:bg-brand-500 text-white rounded-lg transition">Apply</button>
+              </div>
+            </div>
+            <div class="border-t border-cocoa-border/60 pt-1.5">
+              <div class="text-[10px] font-semibold text-cocoa-muted px-1 mb-1">Quick Select</div>
+              <div class="max-h-48 overflow-y-auto space-y-0.5 pr-1" id="year-options-list"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- USER SELECTOR -->
+        <div class="flex items-center gap-1 bg-cocoa-card border border-cocoa-border rounded-xl px-2.5 py-1.5 shadow-sm">
+          <div class="w-6 h-6 rounded-full bg-brand-600 text-white text-[11px] font-bold flex items-center justify-center" id="current-user-avatar">U</div>
+          <select id="user-select" onchange="switchUser(this.value)" class="bg-transparent text-xs font-semibold text-cocoa-text focus:outline-none pr-1 cursor-pointer"></select>
+          <button onclick="openEditUserModal()" title="Edit Profile" class="text-cocoa-muted hover:text-brand-400 p-0.5 transition">
+            <i data-lucide="settings-2" class="w-3.5 h-3.5"></i>
+          </button>
+          <button onclick="openUserModal()" title="Add Friend's Profile" class="text-cocoa-muted hover:text-brand-400 p-0.5 transition">
+            <i data-lucide="user-plus" class="w-3.5 h-3.5"></i>
+          </button>
+        </div>
+
+        <button onclick="openBookModal()" class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-brand-600 hover:bg-brand-500 text-white rounded-xl text-xs sm:text-sm font-semibold shadow-md transition active:scale-95 shadow-brand-600/25">
+          <i data-lucide="plus" class="w-4 h-4"></i>
+          <span class="hidden sm:inline">Add Book</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 pt-7 space-y-8">
+    <!-- COMMUNITY PROGRESS -->
+    <section class="bg-cocoa-card rounded-2xl border border-cocoa-border p-5 shadow-[0_10px_30px_-15px_rgba(37,99,235,0.15)] relative overflow-hidden">
+      <div class="absolute -bottom-10 -right-10 w-40 h-40 bg-brand-600/10 rounded-full blur-2xl pointer-events-none"></div>
+      <div class="flex items-center justify-between mb-4 relative z-10">
+        <div class="flex items-center gap-2">
+          <div class="w-7 h-7 rounded-lg bg-brand-600/20 text-brand-400 flex items-center justify-center border border-brand-500/20">
+            <i data-lucide="users" class="w-4 h-4"></i>
+          </div>
+          <div>
+            <h2 class="text-sm font-bold text-cocoa-text leading-tight">Friends' Reading Progress <span id="community-year-badge" class="text-brand-400 font-bold ml-1 text-xs"></span></h2>
+            <p class="text-[11px] text-cocoa-muted">See how your crew is doing with their reading goals!</p>
+          </div>
+        </div>
+        <button onclick="openUserModal()" class="text-xs font-semibold text-brand-400 hover:text-brand-500 flex items-center gap-1">
+          <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i> Add Friend
+        </button>
+      </div>
+      <div id="community-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 relative z-10"></div>
+    </section>
+
+    <!-- STATS -->
+    <section class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div class="bg-cocoa-card p-4 rounded-2xl border border-cocoa-border shadow-[0_4px_20px_-5px_rgba(0,0,0,0.5)]">
+        <span class="text-[11px] font-semibold text-cocoa-muted uppercase tracking-wider">Completed (<span class="active-year-label">2026</span>)</span>
+        <div class="flex items-baseline gap-1.5 mt-2">
+          <span id="stat-completed" class="text-2xl sm:text-3xl font-extrabold text-cocoa-text">0</span>
+          <span class="text-xs text-cocoa-muted">books</span>
+        </div>
+      </div>
+      <div class="bg-cocoa-card p-4 rounded-2xl border border-cocoa-border shadow-[0_4px_20px_-5px_rgba(0,0,0,0.5)]">
+        <span class="text-[11px] font-semibold text-cocoa-muted uppercase tracking-wider">Pages Read</span>
+        <div class="flex items-baseline gap-1.5 mt-2">
+          <span id="stat-pages" class="text-2xl sm:text-3xl font-extrabold text-cocoa-text">0</span>
+          <span class="text-xs text-cocoa-muted">pages</span>
+        </div>
+      </div>
+      <div class="bg-cocoa-card p-4 rounded-2xl border border-cocoa-border shadow-[0_4px_20px_-5px_rgba(0,0,0,0.5)]">
+        <span class="text-[11px] font-semibold text-cocoa-muted uppercase tracking-wider">Reading Now</span>
+        <div class="flex items-baseline gap-1.5 mt-2">
+          <span id="stat-reading" class="text-2xl sm:text-3xl font-extrabold text-cocoa-text">0</span>
+          <span class="text-xs text-cocoa-muted">books</span>
+        </div>
+      </div>
+      <div class="bg-gradient-to-br from-[#1c2e4a] via-[#241a23] to-[#181216] p-4 rounded-2xl text-white border border-[#2e4066] shadow-[0_8px_25px_-8px_rgba(37,99,235,0.3)] flex flex-col justify-between relative overflow-hidden">
+        <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-bronze-500/20 rounded-full blur-xl pointer-events-none"></div>
+        <div class="flex items-center justify-between text-xs font-bold text-brand-100 relative z-10">
+          <span>Goal <span id="goal-year-label"></span></span>
+          <button onclick="openEditUserModal()" title="Edit Goal" class="text-white/80 hover:text-bronze-400 transition">
+            <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
+          </button>
+        </div>
+        <div class="my-1 relative z-10">
+          <div class="flex justify-between text-[11px] mb-1 font-semibold">
+            <span id="goal-text">0 / 20 books</span>
+            <span id="goal-percent">0%</span>
+          </div>
+          <div class="w-full bg-black/40 rounded-full h-1.5 overflow-hidden">
+            <div id="goal-progress" class="bg-gradient-to-r from-brand-500 to-sky-400 h-full rounded-full transition-all duration-300" style="width: 0%"></div>
+          </div>
+        </div>
+        <p class="text-[10px] text-cocoa-muted truncate relative z-10">bacalagii — keep reading, keep growing!</p>
+      </div>
+    </section>
+
+    <!-- FILTER & SEARCH -->
+    <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div class="flex items-center gap-1 p-1 bg-cocoa-input rounded-xl border border-cocoa-border w-full sm:w-auto text-xs font-semibold">
+        <button onclick="setFilter('all')" id="filter-all" class="filter-btn flex-1 sm:flex-initial px-3.5 py-1.5 rounded-lg bg-cocoa-card text-cocoa-text shadow-sm transition">All</button>
+        <button onclick="setFilter('reading')" id="filter-reading" class="filter-btn flex-1 sm:flex-initial px-3.5 py-1.5 rounded-lg text-cocoa-muted hover:text-cocoa-text transition">Reading</button>
+        <button onclick="setFilter('completed')" id="filter-completed" class="filter-btn flex-1 sm:flex-initial px-3.5 py-1.5 rounded-lg text-cocoa-muted hover:text-cocoa-text transition">Finished</button>
+        <button onclick="setFilter('wishlist')" id="filter-wishlist" class="filter-btn flex-1 sm:flex-initial px-3.5 py-1.5 rounded-lg text-cocoa-muted hover:text-cocoa-text transition">Wishlist</button>
+      </div>
+      <div class="relative w-full sm:w-72">
+        <i data-lucide="search" class="w-4 h-4 text-cocoa-muted absolute left-3 top-1/2 -translate-y-1/2"></i>
+        <input type="text" id="search-input" oninput="handleSearch()" placeholder="Search title, author, or notes..." class="w-full pl-9 pr-4 py-2 bg-cocoa-card border border-cocoa-border rounded-xl text-xs text-cocoa-text placeholder-cocoa-subtle focus:outline-none focus:ring-2 focus:ring-brand-500 transition">
+      </div>
+    </div>
+
+    <!-- BOOKS GRID -->
+    <div id="books-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"></div>
+
+    <!-- EMPTY STATE -->
+    <div id="empty-state" class="hidden flex-col items-center justify-center py-16 text-center">
+      <div class="w-14 h-14 rounded-2xl bg-cocoa-card border border-cocoa-border flex items-center justify-center text-cocoa-muted mb-3">
+        <i data-lucide="book-dashed" class="w-7 h-7"></i>
+      </div>
+      <h3 class="text-sm font-bold text-cocoa-text">No books found here yet</h3>
+      <p class="text-xs text-cocoa-muted mt-1 max-w-xs">Try picking another year or hit 'Add Book' to get your reading list rolling!</p>
+    </div>
+  </main>
+
+  <!-- MODAL: ADD FRIEND -->
+  <div id="user-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm hidden">
+    <div class="bg-cocoa-card border border-cocoa-border w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden">
+      <div class="px-5 py-4 border-b border-cocoa-border flex justify-between items-center bg-cocoa-header/50">
+        <h3 class="font-bold text-cocoa-text text-sm">Add a Friend</h3>
+        <button onclick="closeUserModal()" class="text-cocoa-muted hover:text-cocoa-text"><i data-lucide="x" class="w-4 h-4"></i></button>
+      </div>
+      <form onsubmit="createUser(event)" class="p-5 space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-cocoa-muted mb-1">Friend's Name</label>
+          <input type="text" id="new-user-name" required placeholder="e.g. Alex, Sam, Taylor" class="w-full px-3 py-2 text-sm bg-cocoa-input border border-cocoa-border rounded-lg text-cocoa-text focus:ring-2 focus:ring-brand-500 focus:outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-cocoa-muted mb-1">Yearly Goal (Books)</label>
+          <input type="number" id="new-user-target" min="1" value="20" class="w-full px-3 py-2 text-sm bg-cocoa-input border border-cocoa-border rounded-lg text-cocoa-text focus:ring-2 focus:ring-brand-500 focus:outline-none">
+        </div>
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" onclick="closeUserModal()" class="px-3.5 py-1.5 text-xs font-semibold text-cocoa-muted hover:bg-cocoa-border rounded-lg">Cancel</button>
+          <button type="submit" class="px-4 py-1.5 text-xs font-semibold bg-brand-600 hover:bg-brand-500 text-white rounded-lg transition shadow-md shadow-brand-600/20">Add Profile</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: EDIT USER -->
+  <div id="edit-user-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm hidden">
+    <div class="bg-cocoa-card border border-cocoa-border w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden">
+      <div class="px-5 py-4 border-b border-cocoa-border flex justify-between items-center bg-cocoa-header/50">
+        <h3 class="font-bold text-cocoa-text text-sm">Edit Profile</h3>
+        <button onclick="closeEditUserModal()" class="text-cocoa-muted hover:text-cocoa-text"><i data-lucide="x" class="w-4 h-4"></i></button>
+      </div>
+      <form onsubmit="saveEditUser(event)" class="p-5 space-y-4">
+        <input type="hidden" id="edit-user-id">
+        <div>
+          <label class="block text-xs font-semibold text-cocoa-muted mb-1">Display Name</label>
+          <input type="text" id="edit-user-name" required class="w-full px-3 py-2 text-sm bg-cocoa-input border border-cocoa-border rounded-lg text-cocoa-text focus:ring-2 focus:ring-brand-500 focus:outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-cocoa-muted mb-1">Yearly Goal (Books)</label>
+          <input type="number" id="edit-user-target" min="1" required class="w-full px-3 py-2 text-sm bg-cocoa-input border border-cocoa-border rounded-lg text-cocoa-text focus:ring-2 focus:ring-brand-500 focus:outline-none">
+        </div>
+        <div class="flex items-center justify-between pt-2">
+          <button type="button" onclick="deleteCurrentUser()" class="text-xs font-semibold text-rose-400 hover:text-rose-300 hover:bg-rose-950/40 px-2.5 py-1.5 rounded-lg transition flex items-center gap-1">
+            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Delete Profile
+          </button>
+          <div class="flex gap-2">
+            <button type="button" onclick="closeEditUserModal()" class="px-3 py-1.5 text-xs font-semibold text-cocoa-muted hover:bg-cocoa-border rounded-lg">Cancel</button>
+            <button type="submit" class="px-3.5 py-1.5 text-xs font-semibold bg-brand-600 hover:bg-brand-500 text-white rounded-lg transition shadow-md shadow-brand-600/20">Save</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: ADD/EDIT BOOK -->
+  <div id="book-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm hidden">
+    <div class="bg-cocoa-card border border-cocoa-border w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden max-h-[92vh] flex flex-col">
+      <div class="px-6 py-4 border-b border-cocoa-border flex justify-between items-center bg-cocoa-header/50 flex-shrink-0">
+        <h3 id="book-modal-title" class="font-bold text-cocoa-text text-sm">Add New Book</h3>
+        <button onclick="closeBookModal()" class="text-cocoa-muted hover:text-cocoa-text"><i data-lucide="x" class="w-4 h-4"></i></button>
+      </div>
+      <form id="book-form" onsubmit="saveBook(event)" class="p-6 space-y-4 overflow-y-auto flex-1">
+        <input type="hidden" id="book-id">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-cocoa-muted mb-1">Book Title *</label>
+            <input type="text" id="book-title" required placeholder="e.g. Atomic Habits" class="w-full px-3 py-2 text-sm bg-cocoa-input border border-cocoa-border rounded-lg text-cocoa-text focus:ring-2 focus:ring-brand-500 focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-cocoa-muted mb-1">Author *</label>
+            <input type="text" id="book-author" required placeholder="e.g. James Clear" class="w-full px-3 py-2 text-sm bg-cocoa-input border border-cocoa-border rounded-lg text-cocoa-text focus:ring-2 focus:ring-brand-500 focus:outline-none">
+          </div>
+        </div>
+        <div class="grid grid-cols-3 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-cocoa-muted mb-1">Total Pages *</label>
+            <input type="number" id="book-total-pages" required min="1" placeholder="320" class="w-full px-3 py-2 text-sm bg-cocoa-input border border-cocoa-border rounded-lg text-cocoa-text focus:ring-2 focus:ring-brand-500 focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-cocoa-muted mb-1">Current Page</label>
+            <input type="number" id="book-current-page" min="0" value="0" class="w-full px-3 py-2 text-sm bg-cocoa-input border border-cocoa-border rounded-lg text-cocoa-text focus:ring-2 focus:ring-brand-500 focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-cocoa-muted mb-1">Read Year *</label>
+            <input type="number" id="book-year" placeholder="Year..." required class="w-full px-3 py-2 text-sm bg-cocoa-input border border-cocoa-border rounded-lg text-cocoa-text focus:ring-2 focus:ring-brand-500 focus:outline-none">
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-cocoa-muted mb-1">Status</label>
+            <select id="book-status" class="w-full px-3 py-2 text-sm bg-cocoa-input border border-cocoa-border rounded-lg text-cocoa-text focus:ring-2 focus:ring-brand-500 focus:outline-none">
+              <option value="reading" class="bg-cocoa-card">Currently Reading</option>
+              <option value="wishlist" class="bg-cocoa-card">Want to Read</option>
+              <option value="completed" class="bg-cocoa-card">Finished</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-cocoa-muted mb-1">Genre</label>
+            <input type="text" id="book-genre" placeholder="Self Improvement" class="w-full px-3 py-2 text-sm bg-cocoa-input border border-cocoa-border rounded-lg text-cocoa-text focus:ring-2 focus:ring-brand-500 focus:outline-none">
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-cocoa-muted mb-1">Cover Image URL (Optional)</label>
+          <input type="url" id="book-cover" placeholder="https://images.unsplash.com/..." class="w-full px-3 py-2 text-sm bg-cocoa-input border border-cocoa-border rounded-lg text-cocoa-text focus:ring-2 focus:ring-brand-500 focus:outline-none">
+        </div>
+        <div>
+          <div class="flex justify-between items-center mb-1">
+            <label class="text-xs font-semibold text-cocoa-text flex items-center gap-1.5">
+              <i data-lucide="pen-tool" class="w-3.5 h-3.5 text-brand-400"></i> Notes & Summary
+            </label>
+            <span class="text-[10px] text-cocoa-muted">Key Takeaways</span>
+          </div>
+          <textarea id="book-summary" rows="4" placeholder="Drop your key takeaways, thoughts, or favorite quotes here..." class="w-full px-3 py-2 text-sm bg-cocoa-input border border-cocoa-border rounded-lg text-cocoa-text focus:ring-2 focus:ring-brand-500 focus:outline-none leading-relaxed"></textarea>
+        </div>
+        <div class="pt-3 border-t border-cocoa-border flex justify-end gap-2 flex-shrink-0">
+          <button type="button" onclick="closeBookModal()" class="px-4 py-2 text-xs font-semibold text-cocoa-muted hover:bg-cocoa-border rounded-lg">Cancel</button>
+          <button type="submit" class="px-4 py-2 text-xs font-semibold bg-brand-600 hover:bg-brand-500 text-white rounded-lg transition shadow-md shadow-brand-600/20">Save Book</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: VIEW NOTES -->
+  <div id="note-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm hidden">
+    <div class="bg-cocoa-card border border-cocoa-border w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden">
+      <div class="px-6 py-4 border-b border-cocoa-border flex justify-between items-center bg-cocoa-header/50">
+        <div class="flex items-center gap-2 text-brand-400">
+          <i data-lucide="quote" class="w-4 h-4"></i>
+          <h3 id="note-modal-book-title" class="font-bold text-cocoa-text text-sm truncate max-w-xs">Book Notes</h3>
+        </div>
+        <button onclick="closeNoteModal()" class="text-cocoa-muted hover:text-cocoa-text"><i data-lucide="x" class="w-4 h-4"></i></button>
+      </div>
+      <div class="p-6">
+        <div id="note-modal-content" class="text-sm text-cocoa-text leading-relaxed whitespace-pre-wrap bg-cocoa-input p-4 rounded-xl border border-cocoa-border max-h-96 overflow-y-auto font-normal"></div>
+        <div class="mt-5 flex justify-end">
+          <button onclick="closeNoteModal()" class="px-4 py-2 text-xs font-semibold bg-cocoa-border hover:bg-cocoa-border/80 text-cocoa-text rounded-lg">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const APP_STORAGE_KEY = 'bacalagii_platform_data_v2';
+    
+    let appState = { 
+      activeUserId: 'user_1', 
+      selectedYear: '2026', 
+      users: [ 
+        { 
+          id: 'user_1', 
+          name: 'Faiz', 
+          target: 12, 
+          books: [ 
+            { 
+              id: 'b1', 
+              title: 'Grit', 
+              author: 'Angela Duckworth', 
+              totalPages: 266, 
+              currentPage: 266, 
+              status: 'completed', 
+              genre: 'Self Development', 
+              year: '2026', 
+              cover: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=500&auto=format&fit=crop&q=60', 
+              summary: 'Perseverance and passion for long-term goals (grit) matter way more than raw talent alone.' 
+            }, 
+            { 
+              id: 'b2', 
+              title: 'Atomic Habits', 
+              author: 'James Clear', 
+              totalPages: 320, 
+              currentPage: 180, 
+              status: 'reading', 
+              genre: 'Self Improvement', 
+              year: '2026', 
+              cover: 'https://images.unsplash.com/photo-1589829085413-56de8ae18c73?w=500&auto=format&fit=crop&q=60', 
+              summary: 'Getting 1% better every day compounds massively over time. Systems always beat willpower!' 
+            } 
+          ] 
+        } 
+      ] 
+    };
+
+    let currentFilter = 'all';
+    let searchQuery = '';
+
+    function init() {
+      const saved = localStorage.getItem(APP_STORAGE_KEY) || localStorage.getItem('bacalagi_platform_data_v2');
+      if (saved) {
+        try {
+          appState = JSON.parse(saved);
+          if (!appState.selectedYear) appState.selectedYear = '2026';
+        } catch (e) {}
+      } else {
+        saveData();
+      }
+      renderAll();
+    }
+
+    function saveData() {
+      localStorage.setItem(APP_STORAGE_KEY, JSON.stringify(appState));
+    }
+
+    function getCurrentUser() {
+      let user = appState.users.find(u => u.id === appState.activeUserId);
+      if (!user && appState.users.length > 0) {
+        appState.activeUserId = appState.users[0].id;
+        user = appState.users[0];
+      }
+      return user;
+    }
+
+    function toggleYearDropdown(e) {
+      if (e) e.stopPropagation();
+      const menu = document.getElementById('year-dropdown-menu');
+      if (menu) {
+        menu.classList.toggle('hidden');
+        if (!menu.classList.contains('hidden')) {
+          renderYearOptions();
+          const input = document.getElementById('custom-year-input');
+          if (input) {
+            input.value = appState.selectedYear === 'all' ? '' : appState.selectedYear;
+            input.focus();
+          }
+        }
+      }
+    }
+
+    function closeYearDropdown() {
+      const menu = document.getElementById('year-dropdown-menu');
+      if (menu) menu.classList.add('hidden');
+    }
+
+    document.addEventListener('click', (e) => {
+      const container = document.getElementById('year-dropdown-container');
+      if (container && !container.contains(e.target)) {
+        closeYearDropdown();
+      }
+    });
+
+    function selectYear(yr) {
+      appState.selectedYear = yr;
+      saveData();
+      closeYearDropdown();
+      renderAll();
+    }
+
+    function applyCustomYear() {
+      const input = document.getElementById('custom-year-input');
+      if (!input) return;
+      const val = input.value.trim();
+      if (!val) {
+        selectYear('all');
+        return;
+      }
+      selectYear(val);
+    }
+
+    function resetYearFilter() {
+      selectYear('all');
+    }
+
+    function renderYearOptions() {
+      const list = document.getElementById('year-options-list');
+      if (!list) return;
+
+      const yearsSet = new Set(['2030', '2029', '2028', '2027', '2026', '2025', '2024', '2023', '2022']);
+      appState.users.forEach(u => {
+        if (u.books) {
+          u.books.forEach(b => {
+            if (b.year) yearsSet.add(b.year.toString().trim());
+          });
+        }
+      });
+
+      const sortedYears = Array.from(yearsSet).sort((a, b) => parseInt(b) - parseInt(a));
+      list.innerHTML = '';
+
+      const isAllActive = appState.selectedYear === 'all';
+      const allBtn = document.createElement('button');
+      allBtn.type = 'button';
+      allBtn.className = `w-full text-left px-2.5 py-1.5 rounded-lg text-xs font-semibold flex items-center justify-between transition ${isAllActive ? 'bg-brand-600 text-white' : 'text-cocoa-muted hover:bg-cocoa-border hover:text-cocoa-text'}`;
+      allBtn.innerHTML = `<span>All Time</span>${isAllActive ? '<i data-lucide="check" class="w-3 h-3"></i>' : ''}`;
+      allBtn.onclick = () => selectYear('all');
+      list.appendChild(allBtn);
+
+      sortedYears.forEach(y => {
+        const isSelected = appState.selectedYear === y;
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = `w-full text-left px-2.5 py-1.5 rounded-lg text-xs font-medium flex items-center justify-between transition ${isSelected ? 'bg-brand-600 text-white font-semibold' : 'text-cocoa-text hover:bg-cocoa-border'}`;
+        btn.innerHTML = `<span>Year ${y}</span>${isSelected ? '<i data-lucide="check" class="w-3 h-3"></i>' : ''}`;
+        btn.onclick = () => selectYear(y);
+        list.appendChild(btn);
+      });
+
+      lucide.createIcons();
+    }
+
+    function filterBooksByYear(booksList) {
+      if (!booksList) return [];
+      if (!appState.selectedYear || appState.selectedYear === 'all') return booksList;
+      return booksList.filter(b => (b.year || '2026').toString().trim() === appState.selectedYear.toString().trim());
+    }
+
+    function renderUserSelect() {
+      const select = document.getElementById('user-select');
+      const avatar = document.getElementById('current-user-avatar');
+      const user = getCurrentUser();
+      if (!user) return;
+      select.innerHTML = '';
+      appState.users.forEach(u => {
+        const opt = document.createElement('option');
+        opt.value = u.id;
+        opt.textContent = u.name;
+        opt.className = 'bg-cocoa-card text-cocoa-text';
+        if (u.id === user.id) opt.selected = true;
+        select.appendChild(opt);
+      });
+      avatar.textContent = user.name.charAt(0).toUpperCase();
+    }
+
+    function switchUser(userId) {
+      appState.activeUserId = userId;
+      saveData();
+      renderAll();
+    }
+
+    function openUserModal() {
+      document.getElementById('new-user-name').value = '';
+      document.getElementById('new-user-target').value = 20;
+      document.getElementById('user-modal').classList.remove('hidden');
+    }
+
+    function closeUserModal() {
+      document.getElementById('user-modal').classList.add('hidden');
+    }
+
+    function createUser(e) {
+      e.preventDefault();
+      const name = document.getElementById('new-user-name').value.trim();
+      const target = parseInt(document.getElementById('new-user-target').value) || 20;
+      if (!name) return;
+      const newUser = { id: 'user_' + Date.now(), name, target, books: [] };
+      appState.users.push(newUser);
+      appState.activeUserId = newUser.id;
+      saveData();
+      closeUserModal();
+      renderAll();
+    }
+
+    function openEditUserModal(userId = null) {
+      const targetId = userId || appState.activeUserId;
+      const user = appState.users.find(u => u.id === targetId);
+      if (!user) return;
+      document.getElementById('edit-user-id').value = user.id;
+      document.getElementById('edit-user-name').value = user.name;
+      document.getElementById('edit-user-target').value = user.target || 20;
+      document.getElementById('edit-user-modal').classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function closeEditUserModal() {
+      document.getElementById('edit-user-modal').classList.add('hidden');
+    }
+
+    function saveEditUser(e) {
+      e.preventDefault();
+      const id = document.getElementById('edit-user-id').value;
+      const name = document.getElementById('edit-user-name').value.trim();
+      const target = parseInt(document.getElementById('edit-user-target').value) || 20;
+      if (!name) return;
+      const user = appState.users.find(u => u.id === id);
+      if (user) {
+        user.name = name;
+        user.target = target;
+        saveData();
+        closeEditUserModal();
+        renderAll();
+      }
+    }
+
+    function deleteCurrentUser() {
+      const id = document.getElementById('edit-user-id').value;
+      if (appState.users.length <= 1) {
+        alert("Can't delete this! You need at least 1 profile in bacalagii.");
+        return;
+      }
+      const user = appState.users.find(u => u.id === id);
+      if (!user) return;
+      if (confirm(`Are you sure you want to delete "${user.name}" along with all their books and notes?`)) {
+        appState.users = appState.users.filter(u => u.id !== id);
+        if (appState.activeUserId === id) {
+          appState.activeUserId = appState.users[0].id;
+        }
+        saveData();
+        closeEditUserModal();
+        renderAll();
+      }
+    }
+
+    function renderCommunity() {
+      const container = document.getElementById('community-list');
+      const yearBadge = document.getElementById('community-year-badge');
+      container.innerHTML = '';
+      yearBadge.textContent = appState.selectedYear === 'all' ? '(All Time)' : `(${appState.selectedYear})`;
+
+      appState.users.forEach(user => {
+        const userYearBooks = filterBooksByYear(user.books);
+        const completed = userYearBooks.filter(b => b.status === 'completed').length;
+        const reading = userYearBooks.filter(b => b.status === 'reading').length;
+        const totalPages = userYearBooks.reduce((acc, b) => acc + (parseInt(b.currentPage) || 0), 0);
+        const percent = Math.min(Math.round((completed / (user.target || 20)) * 100), 100);
+        const isSelf = user.id === appState.activeUserId;
+
+        const card = document.createElement('div');
+        card.className = `p-3.5 rounded-xl border transition flex flex-col justify-between ${isSelf ? 'border-brand-500/50 bg-[#1d263b] ring-1 ring-brand-500/30 shadow-[0_4px_15px_-3px_rgba(37,99,235,0.2)]' : 'border-cocoa-border bg-cocoa-input hover:bg-cocoa-cardHover'}`;
+        card.innerHTML = `<div><div class="flex items-center justify-between gap-2 mb-2"><div class="flex items-center gap-2"><div class="w-7 h-7 rounded-full ${isSelf ? 'bg-brand-600' : 'bg-cocoa-border'} text-white text-xs font-bold flex items-center justify-center">${user.name.charAt(0).toUpperCase()}</div><div><div class="flex items-center gap-1.5"><h4 class="text-xs font-bold text-cocoa-text leading-none">${user.name}</h4><button onclick="openEditUserModal('${user.id}')" title="Edit profile" class="text-cocoa-muted hover:text-brand-400 transition"><i data-lucide="settings" class="w-3 h-3"></i></button></div><p class="text-[10px] text-cocoa-muted mt-0.5">${totalPages} pages read</p></div></div><span class="text-xs font-extrabold ${isSelf ? 'text-brand-400' : 'text-cocoa-text'}">${completed} <span class="text-[10px] font-normal text-cocoa-muted">/ ${user.target || 20}</span></span></div><div class="w-full bg-cocoa-bg h-1.5 rounded-full overflow-hidden mb-2 border border-cocoa-border/50"><div class="bg-gradient-to-r from-brand-500 to-sky-400 h-full rounded-full transition-all duration-300" style="width: ${percent}%"></div></div></div><div class="flex items-center justify-between text-[11px] text-cocoa-muted pt-1 border-t border-cocoa-border/60"><span>${reading} reading now</span>${!isSelf ? `<button onclick="switchUser('${user.id}')" class="text-brand-400 hover:underline text-[10px] font-semibold">View Bookshelf →</button>` : '<span class="text-[10px] text-emerald-400 font-semibold">Active</span>'}</div>`;
+        container.appendChild(card);
+      });
+    }
+
+    function updateStats(user) {
+      const yearDisplay = appState.selectedYear === 'all' ? 'All Time' : appState.selectedYear;
+      const labelBtn = document.getElementById('selected-year-label');
+      if (labelBtn) {
+        labelBtn.textContent = appState.selectedYear === 'all' ? 'All Time' : 'Year ' + appState.selectedYear;
+      }
+      document.querySelectorAll('.active-year-label').forEach(el => el.innerText = yearDisplay);
+
+      const userYearBooks = filterBooksByYear(user.books);
+      const completed = userYearBooks.filter(b => b.status === 'completed').length;
+      const reading = userYearBooks.filter(b => b.status === 'reading').length;
+      const totalPages = userYearBooks.reduce((acc, b) => acc + (parseInt(b.currentPage) || 0), 0);
+      const target = user.target || 20;
+      const percent = Math.min(Math.round((completed / target) * 100), 100);
+      const yearLabel = appState.selectedYear === 'all' ? 'All Time' : appState.selectedYear;
+
+      document.getElementById('stat-completed').innerText = completed;
+      document.getElementById('stat-pages').innerText = totalPages.toLocaleString('en-US');
+      document.getElementById('stat-reading').innerText = reading;
+      document.getElementById('goal-year-label').innerText = `(${yearLabel})`;
+      document.getElementById('goal-text').innerText = `${completed} / ${target} books`;
+      document.getElementById('goal-percent').innerText = `${percent}%`;
+      document.getElementById('goal-progress').style.width = `${percent}%`;
+    }
+
+    function setFilter(filter) {
+      currentFilter = filter;
+      document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.classList.remove('bg-cocoa-card', 'text-cocoa-text', 'shadow-sm');
+        btn.classList.add('text-cocoa-muted');
+      });
+      const activeBtn = document.getElementById(`filter-${filter}`);
+      if (activeBtn) {
+        activeBtn.classList.add('bg-cocoa-card', 'text-cocoa-text', 'shadow-sm');
+        activeBtn.classList.remove('text-cocoa-muted');
+      }
+      renderBooks();
+    }
+
+    function handleSearch() {
+      searchQuery = document.getElementById('search-input').value.toLowerCase();
+      renderBooks();
+    }
+
+    function renderBooks() {
+      const user = getCurrentUser();
+      const grid = document.getElementById('books-grid');
+      const emptyState = document.getElementById('empty-state');
+      grid.innerHTML = '';
+
+      if (!user || user.books.length === 0) {
+        emptyState.classList.remove('hidden');
+        emptyState.classList.add('flex');
+        return;
+      }
+
+      const yearFiltered = filterBooksByYear(user.books);
+      const filtered = yearFiltered.filter(book => {
+        const matchesFilter = (currentFilter === 'all') || (book.status === currentFilter);
+        const matchesSearch = book.title.toLowerCase().includes(searchQuery) || book.author.toLowerCase().includes(searchQuery) || (book.summary && book.summary.toLowerCase().includes(searchQuery));
+        return matchesFilter && matchesSearch;
+      });
+
+      if (filtered.length === 0) {
+        emptyState.classList.remove('hidden');
+        emptyState.classList.add('flex');
+      } else {
+        emptyState.classList.add('hidden');
+        emptyState.classList.remove('flex');
+
+        filtered.forEach(book => {
+          const progress = Math.min(Math.round((book.currentPage / book.totalPages) * 100) || 0, 100);
+          let badgeClass = 'bg-cocoa-border text-cocoa-muted border border-cocoa-border';
+          let badgeLabel = 'Wishlist';
+          if (book.status === 'reading') {
+            badgeClass = 'bg-amber-950/70 text-amber-300 border border-amber-800/40';
+            badgeLabel = 'Reading';
+          } else if (book.status === 'completed') {
+            badgeClass = 'bg-blue-950/70 text-blue-300 border border-blue-800/40';
+            badgeLabel = 'Finished';
+          }
+
+          const hasSummary = Boolean(book.summary && book.summary.trim().length > 0);
+          const bookYear = book.year || '2026';
+
+          const card = document.createElement('div');
+          card.className = 'bg-cocoa-card rounded-2xl border border-cocoa-border p-4 shadow-[0_8px_25px_-10px_rgba(0,0,0,0.6)] hover:border-brand-500/40 transition duration-300 flex flex-col justify-between group relative overflow-hidden';
+          card.innerHTML = `<div class="absolute -right-8 -bottom-8 w-28 h-28 bg-brand-500/5 rounded-full blur-xl pointer-events-none group-hover:bg-brand-500/15 transition duration-500"></div><div class="relative z-10"><div class="flex gap-3.5"><div class="w-20 h-28 flex-shrink-0 rounded-xl overflow-hidden bg-cocoa-input border border-cocoa-border relative">${book.cover ? `<img src="${book.cover}" alt="${book.title}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">` : `<div class="w-full h-full flex flex-col items-center justify-center p-2 text-center bg-gradient-to-br from-[#1c2c48] via-[#1a1c24] to-cocoa-input text-brand-400"><i data-lucide="book" class="w-5 h-5 mb-1 opacity-70"></i><span class="text-[9px] font-bold leading-tight line-clamp-2 text-cocoa-text">${book.title}</span></div>`}</div><div class="flex-1 min-w-0"><div class="flex items-center justify-between gap-1 mb-1"><div class="flex items-center gap-1.5"><span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md ${badgeClass}">${badgeLabel}</span><span class="text-[10px] font-bold text-cocoa-muted bg-cocoa-input px-1.5 py-0.5 rounded border border-cocoa-border/50">${bookYear}</span></div><div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition"><button onclick="editBook('${book.id}')" title="Edit" class="p-1 hover:bg-cocoa-border rounded text-cocoa-muted hover:text-cocoa-text"><i data-lucide="pencil" class="w-3.5 h-3.5"></i></button><button onclick="deleteBook('${book.id}')" title="Delete" class="p-1 hover:bg-rose-950/40 rounded text-cocoa-muted hover:text-rose-400"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button></div></div><h4 class="font-bold text-cocoa-text text-sm truncate" title="${book.title}">${book.title}</h4><p class="text-xs text-cocoa-muted truncate mb-1.5">${book.author}</p>${book.genre ? `<span class="inline-block bg-cocoa-input text-cocoa-muted text-[10px] px-2 py-0.5 rounded-full border border-cocoa-border/50 font-medium">${book.genre}</span>` : ''}</div></div><div class="mt-3.5"><div class="flex justify-between text-xs font-semibold mb-1 text-cocoa-muted"><span>${book.currentPage} <span class="text-cocoa-subtle font-normal">/ ${book.totalPages} pages</span></span><span class="text-brand-400 font-bold">${progress}%</span></div><div class="w-full bg-cocoa-bg h-2 rounded-full overflow-hidden border border-cocoa-border/50"><div class="bg-gradient-to-r from-brand-500 to-sky-400 h-full rounded-full transition-all duration-300" style="width: ${progress}%"></div></div></div><div class="mt-3">${hasSummary ? `<button onclick="viewNote('${book.id}')" class="w-full flex items-center justify-between px-2.5 py-1.5 bg-[#17253d] hover:bg-[#1d3052] text-brand-400 border border-brand-500/30 rounded-lg text-xs font-semibold transition"><span class="flex items-center gap-1.5 truncate"><i data-lucide="file-text" class="w-3.5 h-3.5 flex-shrink-0"></i><span class="truncate">View Notes</span></span><span class="text-[10px] text-brand-400 underline flex-shrink-0">Read</span></button>` : `<button onclick="editBook('${book.id}')" class="w-full flex items-center justify-center gap-1 py-1.5 border border-dashed border-cocoa-border text-cocoa-muted hover:text-brand-400 hover:border-brand-500/40 rounded-lg text-[11px] font-medium transition"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Notes</button>`}</div></div><div class="mt-3 pt-3 border-t border-cocoa-border flex items-center justify-between gap-1 relative z-10"><span class="text-[11px] font-medium text-cocoa-muted">Update Page</span><div class="flex items-center gap-1"><button onclick="adjustPage('${book.id}', -10)" class="px-2 py-1 rounded-md border border-cocoa-border bg-cocoa-input hover:bg-cocoa-border text-xs font-bold text-cocoa-text transition active:scale-95">-10</button><button onclick="adjustPage('${book.id}', 10)" class="px-2 py-1 rounded-md border border-cocoa-border bg-cocoa-input hover:bg-cocoa-border text-xs font-bold text-cocoa-text transition active:scale-95">+10</button><button onclick="adjustPage('${book.id}', 1)" class="px-2 py-1 rounded-md bg-brand-600 hover:bg-brand-500 text-white text-xs font-bold transition active:scale-95">+1</button></div></div>`;
+          grid.appendChild(card);
+        });
+      }
+      lucide.createIcons();
+    }
+
+    function renderAll() {
+      const user = getCurrentUser();
+      renderUserSelect();
+      renderCommunity();
+      if (user) updateStats(user);
+      renderBooks();
+    }
+
+    function adjustPage(bookId, delta) {
+      const user = getCurrentUser();
+      if (!user) return;
+      const book = user.books.find(b => b.id === bookId);
+      if (!book) return;
+
+      let newPage = parseInt(book.currentPage) + delta;
+      if (newPage < 0) newPage = 0;
+      if (newPage >= book.totalPages) {
+        newPage = book.totalPages;
+        if (book.status !== 'completed') {
+          book.status = 'completed';
+          confetti({ particleCount: 70, spread: 60, origin: { y: 0.7 } });
+        }
+      } else if (book.status === 'completed' && newPage < book.totalPages) {
+        book.status = 'reading';
+      }
+
+      if (newPage > 0 && book.status === 'wishlist') {
+        book.status = 'reading';
+      }
+
+      book.currentPage = newPage;
+      saveData();
+      renderAll();
+    }
+
+    function viewNote(bookId) {
+      const user = getCurrentUser();
+      const book = user.books.find(b => b.id === bookId);
+      if (!book || !book.summary) return;
+      document.getElementById('note-modal-book-title').innerText = `Notes for: ${book.title}`;
+      document.getElementById('note-modal-content').innerText = book.summary;
+      document.getElementById('note-modal').classList.remove('hidden');
+    }
+
+    function closeNoteModal() {
+      document.getElementById('note-modal').classList.add('hidden');
+    }
+
+    function openBookModal(book = null) {
+      const form = document.getElementById('book-form');
+      const title = document.getElementById('book-modal-title');
+      form.reset();
+
+      if (book) {
+        title.innerText = 'Edit Book & Notes';
+        document.getElementById('book-id').value = book.id;
+        document.getElementById('book-title').value = book.title;
+        document.getElementById('book-author').value = book.author;
+        document.getElementById('book-total-pages').value = book.totalPages;
+        document.getElementById('book-current-page').value = book.currentPage;
+        document.getElementById('book-status').value = book.status;
+        document.getElementById('book-genre').value = book.genre || '';
+        document.getElementById('book-year').value = book.year || (appState.selectedYear === 'all' ? '2026' : appState.selectedYear);
+        document.getElementById('book-cover').value = book.cover || '';
+        document.getElementById('book-summary').value = book.summary || '';
+      } else {
+        title.innerText = 'Add New Book';
+        document.getElementById('book-id').value = '';
+        document.getElementById('book-year').value = appState.selectedYear === 'all' ? '2026' : appState.selectedYear;
+      }
+      document.getElementById('book-modal').classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function closeBookModal() {
+      document.getElementById('book-modal').classList.add('hidden');
+    }
+
+    function editBook(id) {
+      const user = getCurrentUser();
+      const book = user.books.find(b => b.id === id);
+      if (book) openBookModal(book);
+    }
+
+    function deleteBook(id) {
+      if (confirm('Delete this book and its notes?')) {
+        const user = getCurrentUser();
+        user.books = user.books.filter(b => b.id !== id);
+        saveData();
+        renderAll();
+      }
+    }
+
+    function saveBook(e) {
+      e.preventDefault();
+      const user = getCurrentUser();
+      if (!user) return;
+
+      const id = document.getElementById('book-id').value;
+      const title = document.getElementById('book-title').value.trim();
+      const author = document.getElementById('book-author').value.trim();
+      const totalPages = parseInt(document.getElementById('book-total-pages').value);
+      let currentPage = parseInt(document.getElementById('book-current-page').value) || 0;
+      let status = document.getElementById('book-status').value;
+      const genre = document.getElementById('book-genre').value.trim();
+      const year = document.getElementById('book-year').value.trim() || '2026';
+      const cover = document.getElementById('book-cover').value.trim();
+      const summary = document.getElementById('book-summary').value.trim();
+
+      if (currentPage >= totalPages) {
+        currentPage = totalPages;
+        status = 'completed';
+      }
+
+      if (id) {
+        const idx = user.books.findIndex(b => b.id === id);
+        if (idx !== -1) {
+          user.books[idx] = { ...user.books[idx], title, author, totalPages, currentPage, status, genre, year, cover, summary };
+        }
+      } else {
+        const newBook = { id: 'b_' + Date.now(), title, author, totalPages, currentPage, status, genre, year, cover, summary };
+        user.books.unshift(newBook);
+      }
+
+      saveData();
+      closeBookModal();
+      renderAll();
+    }
+
+    window.onload = init;
+  </script>
+</body>
+</html>
