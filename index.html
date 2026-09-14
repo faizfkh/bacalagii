@@ -6,7 +6,7 @@
   <title>bacalagii — Social Reading Tracker & Notes</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400;1,6..72,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
@@ -19,7 +19,8 @@
       theme: {
         extend: {
           fontFamily: {
-            sans: ['"Plus Jakarta Sans"', 'sans-serif']
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            serif: ['"Newsreader"', 'Georgia', 'serif']
           },
           colors: {
             brand: { 50: '#eff6ff', 100: '#dbeafe', 400: '#60a5fa', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8' },
@@ -201,22 +202,21 @@
     </div>
   </main>
 
-  <!-- MODAL: SHARE STORY POSTER (CLEAN & EDITORIAL 9:16) -->
+  <!-- MODAL: SHARE STORY POSTER (TAHUNAN / ALL-ROUND) -->
   <div id="story-modal" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/90 backdrop-blur-md hidden overflow-y-auto">
     <div class="w-full max-w-md my-auto flex flex-col items-center">
       <div class="w-full flex items-center justify-between pb-3 px-1">
         <span class="text-xs font-bold text-cocoa-text flex items-center gap-1.5">
-          <i data-lucide="sparkles" class="w-4 h-4 text-amber-400"></i> Story Poster (Clean Style)
+          <i data-lucide="sparkles" class="w-4 h-4 text-amber-400"></i> Year Wrapped Poster
         </span>
         <button onclick="closeStoryModal()" class="text-cocoa-muted hover:text-white p-1 rounded-lg transition">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
 
-      <!-- POSTER CANVAS AREA (CLEAN MODERN 9:16 STORY) -->
+      <!-- POSTER CANVAS AREA -->
       <div id="story-poster" class="w-full max-w-[340px] sm:max-w-[360px] aspect-[9/16] rounded-3xl p-5 sm:p-6 bg-gradient-to-b from-[#18161b] via-[#121115] to-[#0c0a0d] border border-white/10 shadow-2xl relative overflow-hidden flex flex-col justify-between select-none text-white">
-        
-        <!-- TOP: HEADER BRAND & USER PROFILE -->
+        <!-- TOP -->
         <div class="relative z-10 space-y-3.5">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
@@ -237,7 +237,7 @@
           </div>
         </div>
 
-        <!-- MIDDLE 1: STATS SUMMARY STRIP -->
+        <!-- STATS -->
         <div class="relative z-10 grid grid-cols-3 gap-2 py-1">
           <div class="bg-white/[0.03] border border-white/10 p-2.5 rounded-xl text-center">
             <span class="text-[8px] uppercase tracking-wider font-bold text-white/50 block">Pages</span>
@@ -256,18 +256,18 @@
           </div>
         </div>
 
-        <!-- MIDDLE 2: BOOKS SHOWCASE -->
+        <!-- BOOKS SHOWCASE -->
         <div class="relative z-10 flex-1 flex flex-col justify-center min-h-0 py-1">
           <div class="flex items-center justify-between mb-2 px-1">
             <span class="text-[10px] font-bold uppercase tracking-wider text-white/70 flex items-center gap-1.5">
-              <i data-lucide="bookmark" class="w-3 h-3 text-amber-400"></i> Reading Shelf
+              <i data-lucide="bookmark" class="w-3.5 h-3.5 text-amber-400"></i> Reading Shelf
             </span>
             <span class="text-[9px] font-semibold text-white/40" id="story-book-total-badge">0 Books</span>
           </div>
           <div id="story-covers-showcase" class="grid grid-cols-3 gap-2.5 items-stretch"></div>
         </div>
 
-        <!-- BOTTOM: CLEAN FOOTER & BRANDING -->
+        <!-- FOOTER -->
         <div class="relative z-10 pt-2.5 border-t border-white/10 flex items-center justify-between">
           <div>
             <p class="text-[10px] font-semibold text-white/90 leading-none">One book, one step closer.</p>
@@ -279,7 +279,7 @@
         </div>
       </div>
 
-      <!-- ACTION BUTTONS -->
+      <!-- ACTIONS -->
       <div class="w-full max-w-[340px] sm:max-w-[360px] flex items-center gap-2 mt-3.5">
         <button onclick="downloadStoryPoster()" id="download-story-btn" class="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-gradient-to-r from-amber-500 via-brand-600 to-sky-500 hover:opacity-95 text-white text-xs font-bold shadow-lg shadow-brand-500/25 transition active:scale-95">
           <i data-lucide="download" class="w-4 h-4"></i> Download Image (PNG)
@@ -288,7 +288,99 @@
           <i data-lucide="share-2" class="w-4 h-4"></i>
         </button>
       </div>
-      <p class="text-[10px] text-cocoa-muted mt-2 text-center">Simpan gambar lalu bagikan ke Instagram Story atau WhatsApp Status kamu! 🚀</p>
+    </div>
+  </div>
+
+  <!-- MODAL: SINGLE BOOK STORY POSTER (MEDIUM EDITORIAL STYLE) -->
+  <div id="single-story-modal" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/90 backdrop-blur-md hidden overflow-y-auto">
+    <div class="w-full max-w-md my-auto flex flex-col items-center">
+      <div class="w-full flex items-center justify-between pb-3 px-1">
+        <span class="text-xs font-bold text-cocoa-text flex items-center gap-1.5">
+          <i data-lucide="pen-tool" class="w-4 h-4 text-amber-400"></i> Book Review & Note Story (Medium Style)
+        </span>
+        <button onclick="closeSingleStoryModal()" class="text-cocoa-muted hover:text-white p-1 rounded-lg transition">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- POSTER CANVAS AREA (MEDIUM CLEAN EDITORIAL) -->
+      <div id="single-book-story-poster" class="w-full max-w-[340px] sm:max-w-[360px] aspect-[9/16] rounded-3xl p-6 bg-[#131215] border border-white/10 shadow-2xl relative overflow-hidden flex flex-col justify-between select-none text-white">
+        <!-- SUBTLE BACKGROUND ACCENT -->
+        <div class="absolute -top-16 -right-16 w-44 h-44 bg-brand-500/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -bottom-16 -left-16 w-44 h-44 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+        <!-- TOP: MEDIUM EDITORIAL META -->
+        <div class="relative z-10">
+          <div class="flex items-center justify-between border-b border-white/10 pb-3">
+            <div class="flex items-center gap-2">
+              <div class="w-6 h-6 rounded-lg bg-white/10 border border-white/15 flex items-center justify-center text-white">
+                <i data-lucide="book-open" class="w-3.5 h-3.5 text-brand-400"></i>
+              </div>
+              <span class="font-extrabold text-[11px] tracking-tight uppercase text-white/80">bacalagii</span>
+            </div>
+            <span class="text-[10px] font-medium tracking-wide text-white/50 uppercase">Book Note & Review</span>
+          </div>
+
+          <!-- BOOK HERO: COVER, TITLE, AUTHOR, RATING -->
+          <div class="flex gap-4 mt-4 items-center">
+            <div class="w-20 h-28 flex-shrink-0 rounded-xl overflow-hidden bg-black/60 border border-white/15 shadow-lg relative flex items-center justify-center">
+              <div id="single-story-cover-container" class="w-full h-full"></div>
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-1.5 mb-1.5">
+                <span id="single-story-rating-pill" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-400/15 border border-amber-400/30 text-amber-300 font-bold text-[10px]">
+                  <i data-lucide="star" class="w-3 h-3 fill-amber-300 text-amber-300"></i>
+                  <span id="single-story-rating-val">9.0 / 10</span>
+                </span>
+                <span id="single-story-status-pill" class="text-[9px] font-semibold text-white/50 bg-white/5 px-2 py-0.5 rounded-full border border-white/10">Finished</span>
+              </div>
+              <h2 id="single-story-title" class="text-sm sm:text-base font-extrabold text-white leading-snug line-clamp-2">Atomic Habits</h2>
+              <p id="single-story-author" class="text-xs text-white/60 font-medium truncate mt-0.5">James Clear</p>
+              <p id="single-story-meta" class="text-[10px] text-white/40 mt-1 truncate">Self Improvement • 320 pages</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- MIDDLE: MEDIUM SIGNATURE BLOCKQUOTE FOR NOTES / REVIEW -->
+        <div class="relative z-10 flex-1 my-3 flex flex-col justify-center min-h-0">
+          <div class="bg-white/[0.02] border border-white/10 rounded-2xl p-4 relative overflow-hidden">
+            <div class="flex items-center gap-1.5 text-[9px] font-bold text-white/40 tracking-wider uppercase mb-2">
+              <i data-lucide="quote" class="w-3 h-3 text-amber-400"></i> Key Takeaways & Reflection
+            </div>
+            <!-- BLOCKQUOTE DENGAN GARIS VERTIKAL KHAS MEDIUM -->
+            <blockquote class="border-l-[3px] border-amber-400/80 pl-3.5 py-0.5 my-1">
+              <p id="single-story-notes" class="font-serif text-[12.5px] sm:text-[13.5px] text-white/90 leading-relaxed italic line-clamp-6 whitespace-pre-wrap">
+                "Getting 1% better every day compounds massively over time. Systems always beat willpower!"
+              </p>
+            </blockquote>
+          </div>
+        </div>
+
+        <!-- BOTTOM: READER CREDIT & CLEAN FOOTER -->
+        <div class="relative z-10 pt-3 border-t border-white/10 flex items-center justify-between">
+          <div class="flex items-center gap-2.5">
+            <div id="single-story-user-avatar" class="w-7 h-7 rounded-full bg-brand-600 text-white text-[11px] font-bold flex items-center justify-center flex-shrink-0">F</div>
+            <div class="leading-none">
+              <p class="text-[11px] font-bold text-white leading-tight" id="single-story-user-name">Faiz</p>
+              <span class="text-[9px] text-white/40 mt-0.5 block">Reviewer on bacalagii</span>
+            </div>
+          </div>
+          <div class="text-right leading-none">
+            <span class="text-[9px] font-semibold text-white/40">bacalagii.vercel.app</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ACTION BUTTONS -->
+      <div class="w-full max-w-[340px] sm:max-w-[360px] flex items-center gap-2 mt-3.5">
+        <button onclick="downloadSingleStoryPoster()" id="download-single-story-btn" class="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-gradient-to-r from-amber-500 via-brand-600 to-sky-500 hover:opacity-95 text-white text-xs font-bold shadow-lg shadow-brand-500/25 transition active:scale-95">
+          <i data-lucide="download" class="w-4 h-4"></i> Download Story (PNG)
+        </button>
+        <button onclick="shareSingleStoryNative()" class="p-2.5 rounded-xl bg-cocoa-card border border-cocoa-border hover:border-brand-400 text-cocoa-text text-xs font-bold transition active:scale-95 flex items-center justify-center" title="Share direct">
+          <i data-lucide="share-2" class="w-4 h-4"></i>
+        </button>
+      </div>
+      <p class="text-[10px] text-cocoa-muted mt-2 text-center">Format estetis ala artikel Medium siap diunggah ke Story! 📖✨</p>
     </div>
   </div>
 
@@ -346,7 +438,7 @@
     </div>
   </div>
 
-  <!-- MODAL: ADD/EDIT BOOK -->
+  <!-- MODAL: ADD/EDIT BOOK DENGAN INPUT RATING 0 - 10 -->
   <div id="book-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm hidden">
     <div class="bg-cocoa-card border border-cocoa-border w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden max-h-[92vh] flex flex-col">
       <div class="px-6 py-4 border-b border-cocoa-border flex justify-between items-center bg-cocoa-header/50 flex-shrink-0">
@@ -379,7 +471,7 @@
             <input type="number" id="book-year" placeholder="Year..." required class="w-full px-3 py-2 text-sm bg-cocoa-input border border-cocoa-border rounded-lg text-cocoa-text focus:ring-2 focus:ring-brand-500 focus:outline-none">
           </div>
         </div>
-        <div class="grid grid-cols-2 gap-3">
+        <div class="grid grid-cols-3 gap-3">
           <div>
             <label class="block text-xs font-semibold text-cocoa-muted mb-1">Status</label>
             <select id="book-status" class="w-full px-3 py-2 text-sm bg-cocoa-input border border-cocoa-border rounded-lg text-cocoa-text focus:ring-2 focus:ring-brand-500 focus:outline-none">
@@ -392,6 +484,13 @@
             <label class="block text-xs font-semibold text-cocoa-muted mb-1">Genre</label>
             <input type="text" id="book-genre" placeholder="Self Improvement" class="w-full px-3 py-2 text-sm bg-cocoa-input border border-cocoa-border rounded-lg text-cocoa-text focus:ring-2 focus:ring-brand-500 focus:outline-none">
           </div>
+          <!-- FITUR INPUT RATING 0 - 10 -->
+          <div>
+            <label class="block text-xs font-semibold text-amber-300 mb-1 flex items-center gap-1">
+              <i data-lucide="star" class="w-3 h-3 fill-amber-300"></i> Rating (0 - 10)
+            </label>
+            <input type="number" id="book-rating" min="0" max="10" step="0.1" placeholder="e.g. 9.5" class="w-full px-3 py-2 text-sm bg-cocoa-input border border-amber-500/40 focus:border-amber-400 rounded-lg text-cocoa-text focus:ring-2 focus:ring-amber-500 focus:outline-none font-bold">
+          </div>
         </div>
         <div>
           <label class="block text-xs font-semibold text-cocoa-muted mb-1">Cover Image URL (Optional)</label>
@@ -400,7 +499,7 @@
         <div>
           <div class="flex justify-between items-center mb-1">
             <label class="text-xs font-semibold text-cocoa-text flex items-center gap-1.5">
-              <i data-lucide="pen-tool" class="w-3.5 h-3.5 text-brand-400"></i> Notes & Summary
+              <i data-lucide="pen-tool" class="w-3.5 h-3.5 text-brand-400"></i> Notes & Summary / Review
             </label>
             <span class="text-[10px] text-cocoa-muted">Key Takeaways</span>
           </div>
@@ -414,9 +513,9 @@
     </div>
   </div>
 
-  <!-- MODAL: VIEW NOTES -->
+  <!-- MODAL: VIEW NOTES DENGAN TOMBOL SHARE STORY -->
   <div id="note-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm hidden">
-    <div class="bg-cocoa-card border border-cocoa-border w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden">
+    <div class="bg-cocoa-card border border-cocoa-border w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden flex flex-col">
       <div class="px-6 py-4 border-b border-cocoa-border flex justify-between items-center bg-cocoa-header/50">
         <div class="flex items-center gap-2 text-brand-400">
           <i data-lucide="quote" class="w-4 h-4"></i>
@@ -424,9 +523,12 @@
         </div>
         <button onclick="closeNoteModal()" class="text-cocoa-muted hover:text-cocoa-text"><i data-lucide="x" class="w-4 h-4"></i></button>
       </div>
-      <div class="p-6">
+      <div class="p-6 space-y-4">
         <div id="note-modal-content" class="text-sm text-cocoa-text leading-relaxed whitespace-pre-wrap bg-cocoa-input p-4 rounded-xl border border-cocoa-border max-h-96 overflow-y-auto font-normal"></div>
-        <div class="mt-5 flex justify-end">
+        <div class="flex items-center justify-between pt-2 border-t border-cocoa-border/60">
+          <button id="note-modal-share-story-btn" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-rose-500 hover:opacity-90 text-white text-xs font-bold transition shadow-md">
+            <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> Share Note to Story
+          </button>
           <button onclick="closeNoteModal()" class="px-4 py-2 text-xs font-semibold bg-cocoa-border hover:bg-cocoa-border/80 text-cocoa-text rounded-lg">Close</button>
         </div>
       </div>
@@ -464,6 +566,7 @@
               status: 'completed', 
               genre: 'Self Development', 
               year: '2026', 
+              rating: 8.8,
               cover: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=500&auto=format&fit=crop&q=60',
               summary: 'Perseverance and passion for long-term goals (grit) matter way more than raw talent alone.' 
             }, 
@@ -476,6 +579,7 @@
               status: 'reading', 
               genre: 'Self Improvement', 
               year: '2026', 
+              rating: 9.6,
               cover: 'https://images.unsplash.com/photo-1589829085413-56de8ae18c73?w=500&auto=format&fit=crop&q=60',
               summary: 'Getting 1% better every day compounds massively over time. Systems always beat willpower!' 
             } 
@@ -486,6 +590,7 @@
 
     let currentFilter = 'all';
     let searchQuery = '';
+    let activeSingleBookId = null;
 
     function updateCloudIndicator(status) {
       const badge = document.getElementById('cloud-status-badge');
@@ -893,10 +998,78 @@
 
           const hasSummary = Boolean(book.summary && book.summary.trim().length > 0);
           const bookYear = book.year || '2026';
+          const hasRating = book.rating !== undefined && book.rating !== null && book.rating !== '';
 
           const card = document.createElement('div');
           card.className = 'bg-cocoa-card rounded-2xl border border-cocoa-border p-4 shadow-[0_8px_25px_-10px_rgba(0,0,0,0.6)] hover:border-brand-500/40 transition duration-300 flex flex-col justify-between group relative overflow-hidden';
-          card.innerHTML = `<div class="absolute -right-8 -bottom-8 w-28 h-28 bg-brand-500/5 rounded-full blur-xl pointer-events-none group-hover:bg-brand-500/15 transition duration-500"></div><div class="relative z-10"><div class="flex gap-3.5"><div class="w-20 h-28 flex-shrink-0 rounded-xl overflow-hidden bg-cocoa-input border border-cocoa-border relative">${book.cover ? `<img src="${book.cover}" alt="${book.title}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">` : `<div class="w-full h-full flex flex-col items-center justify-center p-2 text-center bg-gradient-to-br from-[#1c2c48] via-[#1a1c24] to-cocoa-input text-brand-400"><i data-lucide="book" class="w-5 h-5 mb-1 opacity-70"></i><span class="text-[9px] font-bold leading-tight line-clamp-2 text-cocoa-text">${book.title}</span></div>`}</div><div class="flex-1 min-w-0"><div class="flex items-center justify-between gap-1 mb-1"><div class="flex items-center gap-1.5"><span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md ${badgeClass}">${badgeLabel}</span><span class="text-[10px] font-bold text-cocoa-muted bg-cocoa-input px-1.5 py-0.5 rounded border border-cocoa-border/50">${bookYear}</span></div><div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition"><button onclick="editBook('${book.id}')" title="Edit" class="p-1 hover:bg-cocoa-border rounded text-cocoa-muted hover:text-cocoa-text"><i data-lucide="pencil" class="w-3.5 h-3.5"></i></button><button onclick="deleteBook('${book.id}')" title="Delete" class="p-1 hover:bg-rose-950/40 rounded text-cocoa-muted hover:text-rose-400"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button></div></div><h4 class="font-bold text-cocoa-text text-sm truncate" title="${book.title}">${book.title}</h4><p class="text-xs text-cocoa-muted truncate mb-1.5">${book.author}</p>${book.genre ? `<span class="inline-block bg-cocoa-input text-cocoa-muted text-[10px] px-2 py-0.5 rounded-full border border-cocoa-border/50 font-medium">${book.genre}</span>` : ''}</div></div><div class="mt-3.5"><div class="flex justify-between text-xs font-semibold mb-1 text-cocoa-muted"><span>${book.currentPage} <span class="text-cocoa-subtle font-normal">/ ${book.totalPages} pages</span></span><span class="text-brand-400 font-bold">${progress}%</span></div><div class="w-full bg-cocoa-bg h-2 rounded-full overflow-hidden border border-cocoa-border/50"><div class="bg-gradient-to-r from-brand-500 to-sky-400 h-full rounded-full transition-all duration-300" style="width: ${progress}%"></div></div></div><div class="mt-3">${hasSummary ? `<button onclick="viewNote('${book.id}')" class="w-full flex items-center justify-between px-2.5 py-1.5 bg-[#17253d] hover:bg-[#1d3052] text-brand-400 border border-brand-500/30 rounded-lg text-xs font-semibold transition"><span class="flex items-center gap-1.5 truncate"><i data-lucide="file-text" class="w-3.5 h-3.5 flex-shrink-0"></i><span class="truncate">View Notes</span></span><span class="text-[10px] text-brand-400 underline flex-shrink-0">Read</span></button>` : `<button onclick="editBook('${book.id}')" class="w-full flex items-center justify-center gap-1 py-1.5 border border-dashed border-cocoa-border text-cocoa-muted hover:text-brand-400 hover:border-brand-500/40 rounded-lg text-[11px] font-medium transition"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Notes</button>`}</div></div><div class="mt-3 pt-3 border-t border-cocoa-border flex items-center justify-between gap-1 relative z-10"><span class="text-[11px] font-medium text-cocoa-muted">Update Page</span><div class="flex items-center gap-1"><button onclick="adjustPage('${book.id}', -10)" class="px-2 py-1 rounded-md border border-cocoa-border bg-cocoa-input hover:bg-cocoa-border text-xs font-bold text-cocoa-text transition active:scale-95">-10</button><button onclick="adjustPage('${book.id}', 10)" class="px-2 py-1 rounded-md border border-cocoa-border bg-cocoa-input hover:bg-cocoa-border text-xs font-bold text-cocoa-text transition active:scale-95">+10</button><button onclick="adjustPage('${book.id}', 1)" class="px-2 py-1 rounded-md bg-brand-600 hover:bg-brand-500 text-white text-xs font-bold transition active:scale-95">+1</button></div></div>`;
+          card.innerHTML = `
+            <div class="absolute -right-8 -bottom-8 w-28 h-28 bg-brand-500/5 rounded-full blur-xl pointer-events-none group-hover:bg-brand-500/15 transition duration-500"></div>
+            <div class="relative z-10">
+              <div class="flex gap-3.5">
+                <div class="w-20 h-28 flex-shrink-0 rounded-xl overflow-hidden bg-cocoa-input border border-cocoa-border relative">
+                  ${book.cover ? `<img src="${book.cover}" alt="${book.title}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">` : `<div class="w-full h-full flex flex-col items-center justify-center p-2 text-center bg-gradient-to-br from-[#1c2c48] via-[#1a1c24] to-cocoa-input text-brand-400"><i data-lucide="book" class="w-5 h-5 mb-1 opacity-70"></i><span class="text-[9px] font-bold leading-tight line-clamp-2 text-cocoa-text">${book.title}</span></div>`}
+                </div>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center justify-between gap-1 mb-1">
+                    <div class="flex items-center gap-1.5 flex-wrap">
+                      <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md ${badgeClass}">${badgeLabel}</span>
+                      <span class="text-[10px] font-bold text-cocoa-muted bg-cocoa-input px-1.5 py-0.5 rounded border border-cocoa-border/50">${bookYear}</span>
+                      ${hasRating ? `<span class="text-[10px] font-extrabold text-amber-300 bg-amber-400/10 px-1.5 py-0.5 rounded border border-amber-400/30 flex items-center gap-0.5"><i data-lucide="star" class="w-2.5 h-2.5 fill-amber-400 text-amber-400"></i> ${book.rating}/10</span>` : ''}
+                    </div>
+                    <div class="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition">
+                      <button onclick="openSingleBookStoryModal('${book.id}')" title="Share Review to Story" class="p-1 hover:bg-amber-500/20 rounded text-amber-300 transition">
+                        <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+                      </button>
+                      <button onclick="editBook('${book.id}')" title="Edit" class="p-1 hover:bg-cocoa-border rounded text-cocoa-muted hover:text-cocoa-text">
+                        <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
+                      </button>
+                      <button onclick="deleteBook('${book.id}')" title="Delete" class="p-1 hover:bg-rose-950/40 rounded text-cocoa-muted hover:text-rose-400">
+                        <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                      </button>
+                    </div>
+                  </div>
+                  <h4 class="font-bold text-cocoa-text text-sm truncate mt-1" title="${book.title}">${book.title}</h4>
+                  <p class="text-xs text-cocoa-muted truncate mb-1.5">${book.author}</p>
+                  ${book.genre ? `<span class="inline-block bg-cocoa-input text-cocoa-muted text-[10px] px-2 py-0.5 rounded-full border border-cocoa-border/50 font-medium">${book.genre}</span>` : ''}
+                </div>
+              </div>
+
+              <div class="mt-3.5">
+                <div class="flex justify-between text-xs font-semibold mb-1 text-cocoa-muted">
+                  <span>${book.currentPage} <span class="text-cocoa-subtle font-normal">/ ${book.totalPages} pages</span></span>
+                  <span class="text-brand-400 font-bold">${progress}%</span>
+                </div>
+                <div class="w-full bg-cocoa-bg h-2 rounded-full overflow-hidden border border-cocoa-border/50">
+                  <div class="bg-gradient-to-r from-brand-500 to-sky-400 h-full rounded-full transition-all duration-300" style="width: ${progress}%"></div>
+                </div>
+              </div>
+
+              <div class="mt-3 flex gap-2">
+                ${hasSummary ? `
+                  <button onclick="viewNote('${book.id}')" class="flex-1 flex items-center justify-between px-2.5 py-1.5 bg-[#17253d] hover:bg-[#1d3052] text-brand-400 border border-brand-500/30 rounded-lg text-xs font-semibold transition">
+                    <span class="flex items-center gap-1.5 truncate"><i data-lucide="file-text" class="w-3.5 h-3.5 flex-shrink-0"></i><span class="truncate">View Notes</span></span>
+                    <span class="text-[10px] text-brand-400 underline flex-shrink-0">Read</span>
+                  </button>
+                  <button onclick="openSingleBookStoryModal('${book.id}')" title="Share Review to Story" class="px-2.5 py-1.5 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-400/30 rounded-lg text-xs font-semibold flex items-center gap-1 transition">
+                    <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> Story
+                  </button>
+                ` : `
+                  <button onclick="editBook('${book.id}')" class="w-full flex items-center justify-center gap-1 py-1.5 border border-dashed border-cocoa-border text-cocoa-muted hover:text-brand-400 hover:border-brand-500/40 rounded-lg text-[11px] font-medium transition">
+                    <i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Notes & Review
+                  </button>
+                `}
+              </div>
+            </div>
+
+            <div class="mt-3 pt-3 border-t border-cocoa-border flex items-center justify-between gap-1 relative z-10">
+              <span class="text-[11px] font-medium text-cocoa-muted">Update Page</span>
+              <div class="flex items-center gap-1">
+                <button onclick="adjustPage('${book.id}', -10)" class="px-2 py-1 rounded-md border border-cocoa-border bg-cocoa-input hover:bg-cocoa-border text-xs font-bold text-cocoa-text transition active:scale-95">-10</button>
+                <button onclick="adjustPage('${book.id}', 10)" class="px-2 py-1 rounded-md border border-cocoa-border bg-cocoa-input hover:bg-cocoa-border text-xs font-bold text-cocoa-text transition active:scale-95">+10</button>
+                <button onclick="adjustPage('${book.id}', 1)" class="px-2 py-1 rounded-md bg-brand-600 hover:bg-brand-500 text-white text-xs font-bold transition active:scale-95">+1</button>
+              </div>
+            </div>
+          `;
           grid.appendChild(card);
         });
       }
@@ -942,8 +1115,16 @@
       const user = getCurrentUser();
       const book = user.books.find(b => b.id === bookId);
       if (!book || !book.summary) return;
+      activeSingleBookId = bookId;
       document.getElementById('note-modal-book-title').innerText = `Notes for: ${book.title}`;
       document.getElementById('note-modal-content').innerText = book.summary;
+      
+      const shareBtn = document.getElementById('note-modal-share-story-btn');
+      shareBtn.onclick = () => {
+        closeNoteModal();
+        openSingleBookStoryModal(bookId);
+      };
+
       document.getElementById('note-modal').classList.remove('hidden');
     }
 
@@ -965,12 +1146,14 @@
         document.getElementById('book-current-page').value = book.currentPage;
         document.getElementById('book-status').value = book.status;
         document.getElementById('book-genre').value = book.genre || '';
+        document.getElementById('book-rating').value = (book.rating !== undefined && book.rating !== null) ? book.rating : '';
         document.getElementById('book-year').value = book.year || (appState.selectedYear === 'all' ? '2026' : appState.selectedYear);
         document.getElementById('book-cover').value = book.cover || '';
         document.getElementById('book-summary').value = book.summary || '';
       } else {
         title.innerText = 'Add New Book';
         document.getElementById('book-id').value = '';
+        document.getElementById('book-rating').value = '';
         document.getElementById('book-year').value = appState.selectedYear === 'all' ? '2026' : appState.selectedYear;
       }
       document.getElementById('book-modal').classList.remove('hidden');
@@ -1008,6 +1191,8 @@
       let currentPage = parseInt(document.getElementById('book-current-page').value) || 0;
       let status = document.getElementById('book-status').value;
       const genre = document.getElementById('book-genre').value.trim();
+      const ratingVal = document.getElementById('book-rating').value.trim();
+      const rating = ratingVal !== '' ? parseFloat(ratingVal) : null;
       const year = document.getElementById('book-year').value.trim() || '2026';
       const cover = document.getElementById('book-cover').value.trim();
       const summary = document.getElementById('book-summary').value.trim();
@@ -1020,10 +1205,10 @@
       if (id) {
         const idx = user.books.findIndex(b => b.id === id);
         if (idx !== -1) {
-          user.books[idx] = { ...user.books[idx], title, author, totalPages, currentPage, status, genre, year, cover, summary };
+          user.books[idx] = { ...user.books[idx], title, author, totalPages, currentPage, status, genre, rating, year, cover, summary };
         }
       } else {
-        const newBook = { id: 'b_' + Date.now(), title, author, totalPages, currentPage, status, genre, year, cover, summary };
+        const newBook = { id: 'b_' + Date.now(), title, author, totalPages, currentPage, status, genre, rating, year, cover, summary };
         user.books.unshift(newBook);
       }
 
@@ -1032,7 +1217,7 @@
       renderAll();
     }
 
-    // STORY POSTER GENERATOR & SHARE FEATURE
+    // STORY 1: TAHUNAN (ALL-ROUND) STORY POSTER
     function openStoryModal() {
       const user = getCurrentUser();
       if (!user) return;
@@ -1040,7 +1225,6 @@
       const year = appState.selectedYear === 'all' ? 'All Time' : appState.selectedYear;
       const yearBooks = filterBooksByYear(user.books);
       
-      // FILTER HANYA BUKU YANG COMPLETED ATAU READING (WISHLIST DIABAIKAN)
       const activeBooks = yearBooks.filter(b => b.status === 'completed' || b.status === 'reading');
       const completedBooks = activeBooks.filter(b => b.status === 'completed');
       const readingBooks = activeBooks.filter(b => b.status === 'reading');
@@ -1049,7 +1233,7 @@
       const target = user.target || 20;
       const percent = Math.min(Math.round((completedBooks.length / target) * 100), 100);
 
-      document.getElementById('story-year-tag').innerText = year === 'All Time' ? 'All Time' : `${year} Journey`;
+      document.getElementById('story-year-tag').innerText = year === 'All Time' ? 'All Time' : `${year} Reading`;
       document.getElementById('story-user-name').innerText = user.name;
       document.getElementById('story-user-avatar').innerText = user.name.charAt(0).toUpperCase();
       document.getElementById('story-pages-count').innerText = totalPages.toLocaleString('en-US');
@@ -1060,7 +1244,6 @@
       document.getElementById('story-books-substatus').innerText = `${completedBooks.length} Done • ${readingBooks.length} Reading`;
       document.getElementById('story-book-total-badge').innerText = `${activeBooks.length} Total Books`;
 
-      // Render showcase covers + title + author (Clean Style)
       const showcase = document.getElementById('story-covers-showcase');
       showcase.innerHTML = '';
 
@@ -1071,7 +1254,6 @@
         showcase.innerHTML = `
           <i data-lucide="book-open" class="w-8 h-8 text-white/30 mb-2"></i>
           <p class="text-xs font-semibold text-white/70">Belum ada buku yang selesai atau sedang dibaca di ${year}</p>
-          <p class="text-[10px] text-white/40 mt-0.5">Mulai membaca dan update progressmu!</p>
         `;
       } else {
         const cols = sortedActiveBooks.length <= 2 ? 'grid-cols-2' : 'grid-cols-3';
@@ -1160,6 +1342,125 @@
         });
       } catch (e) {
         downloadStoryPoster();
+      }
+    }
+
+    // STORY 2: SINGLE BOOK NOTE STORY POSTER (MEDIUM EDITORIAL STYLE)
+    function openSingleBookStoryModal(bookId) {
+      const user = getCurrentUser();
+      if (!user) return;
+      const book = user.books.find(b => b.id === bookId);
+      if (!book) return;
+      activeSingleBookId = bookId;
+
+      document.getElementById('single-story-title').innerText = book.title;
+      document.getElementById('single-story-author').innerText = book.author || 'Unknown Author';
+      document.getElementById('single-story-meta').innerText = `${book.genre || 'General'} • ${book.totalPages} pages`;
+      
+      // Status Pill
+      const statusEl = document.getElementById('single-story-status-pill');
+      if (book.status === 'completed') {
+        statusEl.innerText = 'Finished';
+        statusEl.className = 'text-[9px] font-semibold text-emerald-300 bg-emerald-500/15 px-2 py-0.5 rounded-full border border-emerald-500/30';
+      } else if (book.status === 'reading') {
+        statusEl.innerText = 'Currently Reading';
+        statusEl.className = 'text-[9px] font-semibold text-amber-300 bg-amber-500/15 px-2 py-0.5 rounded-full border border-amber-500/30';
+      } else {
+        statusEl.innerText = 'Want to Read';
+        statusEl.className = 'text-[9px] font-semibold text-white/50 bg-white/5 px-2 py-0.5 rounded-full border border-white/10';
+      }
+
+      // Rating Pill (0-10)
+      const ratingContainer = document.getElementById('single-story-rating-pill');
+      const ratingVal = document.getElementById('single-story-rating-val');
+      if (book.rating !== undefined && book.rating !== null && book.rating !== '') {
+        ratingVal.innerText = `${book.rating} / 10`;
+        ratingContainer.classList.remove('hidden');
+      } else {
+        ratingContainer.classList.add('hidden');
+      }
+
+      // Cover Container
+      const coverContainer = document.getElementById('single-story-cover-container');
+      if (book.cover) {
+        coverContainer.innerHTML = `<img src="${book.cover}" crossorigin="anonymous" alt="${book.title}" class="w-full h-full object-cover">`;
+      } else {
+        coverContainer.innerHTML = `<div class="w-full h-full flex flex-col items-center justify-center p-2 text-center text-brand-300"><i data-lucide="book" class="w-6 h-6 mb-1 opacity-70"></i><span class="text-[9px] font-bold line-clamp-2 text-white/80">${book.title}</span></div>`;
+      }
+
+      // Medium-styled Review / Summary
+      const noteText = (book.summary && book.summary.trim().length > 0) 
+        ? `“${book.summary.trim()}”` 
+        : '“No written review added yet. Keep turning the pages and jot down what matters most.”';
+      document.getElementById('single-story-notes').innerText = noteText;
+
+      // User Info
+      document.getElementById('single-story-user-name').innerText = user.name;
+      document.getElementById('single-story-user-avatar').innerText = user.name.charAt(0).toUpperCase();
+
+      document.getElementById('single-story-modal').classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function closeSingleStoryModal() {
+      document.getElementById('single-story-modal').classList.add('hidden');
+    }
+
+    async function generateSingleStoryCanvas() {
+      const poster = document.getElementById('single-book-story-poster');
+      return await html2canvas(poster, {
+        scale: 3,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#131215'
+      });
+    }
+
+    async function downloadSingleStoryPoster() {
+      const btn = document.getElementById('download-single-story-btn');
+      const originalText = btn.innerHTML;
+      btn.innerHTML = '<span class="animate-pulse">Generating Story...</span>';
+      btn.disabled = true;
+
+      try {
+        const canvas = await generateSingleStoryCanvas();
+        const user = getCurrentUser();
+        const book = user?.books?.find(b => b.id === activeSingleBookId);
+        const safeTitle = (book?.title || 'review').toLowerCase().replace(/[^a-z0-9]/g, '-');
+        
+        const link = document.createElement('a');
+        link.download = `bacalagii-review-${safeTitle}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+        confetti({ particleCount: 50, spread: 60, origin: { y: 0.6 } });
+      } catch (err) {
+        console.error('Failed to generate single story poster:', err);
+        alert('Gagal mendownload gambar story review.');
+      } finally {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+        lucide.createIcons();
+      }
+    }
+
+    async function shareSingleStoryNative() {
+      try {
+        const canvas = await generateSingleStoryCanvas();
+        canvas.toBlob(async (blob) => {
+          if (!blob) return;
+          const file = new File([blob], `bacalagii-review.png`, { type: 'image/png' });
+          if (navigator.canShare && navigator.canShare({ files: [file] })) {
+            await navigator.share({
+              files: [file],
+              title: 'Book Note on bacalagii',
+              text: 'Check out my book takeaways on bacalagii! 📖'
+            });
+          } else {
+            downloadSingleStoryPoster();
+          }
+        });
+      } catch (e) {
+        downloadSingleStoryPoster();
       }
     }
 
