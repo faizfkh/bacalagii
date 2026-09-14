@@ -1,8 +1,8 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>bacalagii — Social Reading Tracker & Notes</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -29,28 +29,28 @@
 </head>
 <body class="bg-cocoa-bg text-cocoa-text font-sans min-h-screen pb-20 antialiased selection:bg-brand-600 selection:text-white">
 
-  <!-- NAVBAR -->
-  <header class="sticky top-0 z-40 backdrop-blur-md bg-cocoa-header/85 border-b border-cocoa-border">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-600 via-brand-700 to-bronze-500 flex items-center justify-center text-white shadow-lg shadow-brand-600/20">
-          <i data-lucide="book-open-check" class="w-5 h-5"></i>
+  <!-- NAVBAR DENGAN SAFE-AREA UNTUK MOBILE -->
+  <header class="sticky top-0 z-40 backdrop-blur-md bg-cocoa-header/90 border-b border-cocoa-border pt-[max(0.6rem,env(safe-area-inset-top))] pb-2 sm:pb-0 transition-all">
+    <div class="max-w-6xl mx-auto px-3.5 sm:px-6 min-h-[3.85rem] sm:min-h-[4.25rem] flex items-center justify-between gap-2 sm:gap-3">
+      <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
+        <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-brand-600 via-brand-700 to-bronze-500 flex items-center justify-center text-white shadow-lg shadow-brand-600/20 flex-shrink-0">
+          <i data-lucide="book-open-check" class="w-4 h-4 sm:w-5 sm:h-5"></i>
         </div>
-        <div>
-          <h1 class="font-extrabold text-lg tracking-tight text-cocoa-text leading-none">bacalagii</h1>
-          <p class="text-[11px] text-cocoa-muted mt-0.5 font-medium">One book, one step closer</p>
+        <div class="truncate">
+          <h1 class="font-extrabold text-base sm:text-lg tracking-tight text-cocoa-text leading-none">bacalagii</h1>
+          <p class="text-[10px] sm:text-[11px] text-cocoa-muted mt-1 font-medium truncate">One book, one step closer</p>
         </div>
       </div>
 
-      <div class="flex items-center gap-2 sm:gap-3 flex-wrap justify-end">
+      <div class="flex items-center gap-1.5 sm:gap-3 flex-shrink-0">
         <!-- CUSTOM YEAR FILTER DROPDOWN -->
         <div class="relative" id="year-dropdown-container">
-          <button type="button" onclick="toggleYearDropdown(event)" class="flex items-center gap-1.5 bg-cocoa-card border border-cocoa-border rounded-xl px-2.5 py-1.5 shadow-sm text-xs font-semibold text-cocoa-text hover:border-brand-500/50 transition">
+          <button type="button" onclick="toggleYearDropdown(event)" class="flex items-center gap-1 bg-cocoa-card border border-cocoa-border rounded-xl px-2 py-1.5 sm:px-2.5 sm:py-1.5 shadow-sm text-xs font-semibold text-cocoa-text hover:border-brand-500/50 transition">
             <i data-lucide="calendar" class="w-3.5 h-3.5 text-cocoa-muted"></i>
-            <span id="selected-year-label">Year 2026</span>
+            <span id="selected-year-label" class="text-[11px] sm:text-xs">Year 2026</span>
             <i data-lucide="chevron-down" class="w-3 h-3 text-cocoa-muted ml-0.5"></i>
           </button>
-          <div id="year-dropdown-menu" class="hidden absolute top-full mt-2 left-0 sm:right-0 sm:left-auto z-50 w-60 bg-cocoa-card border border-cocoa-border rounded-2xl shadow-2xl p-2.5 backdrop-blur-lg">
+          <div id="year-dropdown-menu" class="hidden absolute top-full mt-2 right-0 z-50 w-56 sm:w-60 bg-cocoa-card border border-cocoa-border rounded-2xl shadow-2xl p-2.5 backdrop-blur-lg">
             <div class="mb-2">
               <label class="block text-[10px] font-semibold text-cocoa-muted mb-1 px-1">Custom Year</label>
               <div class="flex gap-1">
@@ -66,40 +66,40 @@
         </div>
 
         <!-- USER SELECTOR -->
-        <div class="flex items-center gap-1 bg-cocoa-card border border-cocoa-border rounded-xl px-2.5 py-1.5 shadow-sm">
-          <div class="w-6 h-6 rounded-full bg-brand-600 text-white text-[11px] font-bold flex items-center justify-center" id="current-user-avatar">U</div>
-          <select id="user-select" onchange="switchUser(this.value)" class="bg-transparent text-xs font-semibold text-cocoa-text focus:outline-none pr-1 cursor-pointer"></select>
+        <div class="flex items-center gap-1 bg-cocoa-card border border-cocoa-border rounded-xl px-2 py-1 sm:px-2.5 sm:py-1.5 shadow-sm">
+          <div class="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-brand-600 text-white text-[10px] sm:text-[11px] font-bold flex items-center justify-center" id="current-user-avatar">U</div>
+          <select id="user-select" onchange="switchUser(this.value)" class="bg-transparent text-[11px] sm:text-xs font-semibold text-cocoa-text focus:outline-none max-w-[65px] sm:max-w-none pr-0.5 cursor-pointer"></select>
           <button onclick="openEditUserModal()" title="Edit Profile" class="text-cocoa-muted hover:text-brand-400 p-0.5 transition">
-            <i data-lucide="settings-2" class="w-3.5 h-3.5"></i>
+            <i data-lucide="settings-2" class="w-3 h-3 sm:w-3.5 sm:h-3.5"></i>
           </button>
           <button onclick="openUserModal()" title="Add Friend's Profile" class="text-cocoa-muted hover:text-brand-400 p-0.5 transition">
-            <i data-lucide="user-plus" class="w-3.5 h-3.5"></i>
+            <i data-lucide="user-plus" class="w-3 h-3 sm:w-3.5 sm:h-3.5"></i>
           </button>
         </div>
 
-        <button onclick="openBookModal()" class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-brand-600 hover:bg-brand-500 text-white rounded-xl text-xs sm:text-sm font-semibold shadow-md transition active:scale-95 shadow-brand-600/25">
+        <button onclick="openBookModal()" class="inline-flex items-center justify-center w-8 h-8 sm:w-auto sm:h-auto sm:px-3.5 sm:py-2 bg-brand-600 hover:bg-brand-500 text-white rounded-xl text-xs sm:text-sm font-semibold shadow-md transition active:scale-95 shadow-brand-600/25">
           <i data-lucide="plus" class="w-4 h-4"></i>
-          <span class="hidden sm:inline">Add Book</span>
+          <span class="hidden sm:inline sm:ml-1.5">Add Book</span>
         </button>
       </div>
     </div>
   </header>
 
-  <main class="max-w-6xl mx-auto px-4 sm:px-6 pt-7 space-y-8">
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 pt-5 sm:pt-7 space-y-6 sm:space-y-8">
     <!-- COMMUNITY PROGRESS -->
-    <section class="bg-cocoa-card rounded-2xl border border-cocoa-border p-5 shadow-[0_10px_30px_-15px_rgba(37,99,235,0.15)] relative overflow-hidden">
+    <section class="bg-cocoa-card rounded-2xl border border-cocoa-border p-4 sm:p-5 shadow-[0_10px_30px_-15px_rgba(37,99,235,0.15)] relative overflow-hidden">
       <div class="absolute -bottom-10 -right-10 w-40 h-40 bg-brand-600/10 rounded-full blur-2xl pointer-events-none"></div>
       <div class="flex items-center justify-between mb-4 relative z-10">
         <div class="flex items-center gap-2">
-          <div class="w-7 h-7 rounded-lg bg-brand-600/20 text-brand-400 flex items-center justify-center border border-brand-500/20">
+          <div class="w-7 h-7 rounded-lg bg-brand-600/20 text-brand-400 flex items-center justify-center border border-brand-500/20 flex-shrink-0">
             <i data-lucide="users" class="w-4 h-4"></i>
           </div>
           <div>
-            <h2 class="text-sm font-bold text-cocoa-text leading-tight">Friends' Reading Progress <span id="community-year-badge" class="text-brand-400 font-bold ml-1 text-xs"></span></h2>
-            <p class="text-[11px] text-cocoa-muted">See how your crew is doing with their reading goals!</p>
+            <h2 class="text-xs sm:text-sm font-bold text-cocoa-text leading-tight">Friends' Reading Progress <span id="community-year-badge" class="text-brand-400 font-bold ml-1 text-xs"></span></h2>
+            <p class="text-[10px] sm:text-[11px] text-cocoa-muted">See how your crew is doing with their reading goals!</p>
           </div>
         </div>
-        <button onclick="openUserModal()" class="text-xs font-semibold text-brand-400 hover:text-brand-500 flex items-center gap-1">
+        <button onclick="openUserModal()" class="text-xs font-semibold text-brand-400 hover:text-brand-500 flex items-center gap-1 flex-shrink-0">
           <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i> Add Friend
         </button>
       </div>
@@ -107,33 +107,33 @@
     </section>
 
     <!-- STATS -->
-    <section class="grid grid-cols-2 md:grid-cols-4 gap-4">
-      <div class="bg-cocoa-card p-4 rounded-2xl border border-cocoa-border shadow-[0_4px_20px_-5px_rgba(0,0,0,0.5)]">
-        <span class="text-[11px] font-semibold text-cocoa-muted uppercase tracking-wider">Completed (<span class="active-year-label">2026</span>)</span>
+    <section class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+      <div class="bg-cocoa-card p-3.5 sm:p-4 rounded-2xl border border-cocoa-border shadow-[0_4px_20px_-5px_rgba(0,0,0,0.5)] flex flex-col justify-between">
+        <span class="text-[10px] sm:text-[11px] font-semibold text-cocoa-muted uppercase tracking-wider leading-snug">Completed (<span class="active-year-label">2026</span>)</span>
         <div class="flex items-baseline gap-1.5 mt-2">
           <span id="stat-completed" class="text-2xl sm:text-3xl font-extrabold text-cocoa-text">0</span>
           <span class="text-xs text-cocoa-muted">books</span>
         </div>
       </div>
-      <div class="bg-cocoa-card p-4 rounded-2xl border border-cocoa-border shadow-[0_4px_20px_-5px_rgba(0,0,0,0.5)]">
-        <span class="text-[11px] font-semibold text-cocoa-muted uppercase tracking-wider">Pages Read</span>
+      <div class="bg-cocoa-card p-3.5 sm:p-4 rounded-2xl border border-cocoa-border shadow-[0_4px_20px_-5px_rgba(0,0,0,0.5)] flex flex-col justify-between">
+        <span class="text-[10px] sm:text-[11px] font-semibold text-cocoa-muted uppercase tracking-wider leading-snug">Pages Read</span>
         <div class="flex items-baseline gap-1.5 mt-2">
           <span id="stat-pages" class="text-2xl sm:text-3xl font-extrabold text-cocoa-text">0</span>
           <span class="text-xs text-cocoa-muted">pages</span>
         </div>
       </div>
-      <div class="bg-cocoa-card p-4 rounded-2xl border border-cocoa-border shadow-[0_4px_20px_-5px_rgba(0,0,0,0.5)]">
-        <span class="text-[11px] font-semibold text-cocoa-muted uppercase tracking-wider">Reading Now</span>
+      <div class="bg-cocoa-card p-3.5 sm:p-4 rounded-2xl border border-cocoa-border shadow-[0_4px_20px_-5px_rgba(0,0,0,0.5)] flex flex-col justify-between">
+        <span class="text-[10px] sm:text-[11px] font-semibold text-cocoa-muted uppercase tracking-wider leading-snug">Reading Now</span>
         <div class="flex items-baseline gap-1.5 mt-2">
           <span id="stat-reading" class="text-2xl sm:text-3xl font-extrabold text-cocoa-text">0</span>
           <span class="text-xs text-cocoa-muted">books</span>
         </div>
       </div>
-      <div class="bg-gradient-to-br from-[#1c2e4a] via-[#241a23] to-[#181216] p-4 rounded-2xl text-white border border-[#2e4066] shadow-[0_8px_25px_-8px_rgba(37,99,235,0.3)] flex flex-col justify-between relative overflow-hidden">
+      <div class="bg-gradient-to-br from-[#1c2e4a] via-[#241a23] to-[#181216] p-3.5 sm:p-4 rounded-2xl text-white border border-[#2e4066] shadow-[0_8px_25px_-8px_rgba(37,99,235,0.3)] flex flex-col justify-between relative overflow-hidden">
         <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-bronze-500/20 rounded-full blur-xl pointer-events-none"></div>
         <div class="flex items-center justify-between text-xs font-bold text-brand-100 relative z-10">
           <span>Goal <span id="goal-year-label"></span></span>
-          <button onclick="openEditUserModal()" title="Edit Goal" class="text-white/80 hover:text-bronze-400 transition">
+          <button onclick="openEditUserModal()" title="Edit Goal" class="text-white/80 hover:text-bronze-400 transition p-0.5">
             <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
           </button>
         </div>
@@ -146,17 +146,17 @@
             <div id="goal-progress" class="bg-gradient-to-r from-brand-500 to-sky-400 h-full rounded-full transition-all duration-300" style="width: 0%"></div>
           </div>
         </div>
-        <p class="text-[10px] text-cocoa-muted truncate relative z-10">bacalagii — keep reading, keep growing!</p>
+        <p class="text-[10px] text-cocoa-muted leading-tight mt-1 relative z-10">bacalagii — keep reading, keep growing!</p>
       </div>
     </section>
 
     <!-- FILTER & SEARCH -->
     <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
-      <div class="flex items-center gap-1 p-1 bg-cocoa-input rounded-xl border border-cocoa-border w-full sm:w-auto text-xs font-semibold">
-        <button onclick="setFilter('all')" id="filter-all" class="filter-btn flex-1 sm:flex-initial px-3.5 py-1.5 rounded-lg bg-cocoa-card text-cocoa-text shadow-sm transition">All</button>
-        <button onclick="setFilter('reading')" id="filter-reading" class="filter-btn flex-1 sm:flex-initial px-3.5 py-1.5 rounded-lg text-cocoa-muted hover:text-cocoa-text transition">Reading</button>
-        <button onclick="setFilter('completed')" id="filter-completed" class="filter-btn flex-1 sm:flex-initial px-3.5 py-1.5 rounded-lg text-cocoa-muted hover:text-cocoa-text transition">Finished</button>
-        <button onclick="setFilter('wishlist')" id="filter-wishlist" class="filter-btn flex-1 sm:flex-initial px-3.5 py-1.5 rounded-lg text-cocoa-muted hover:text-cocoa-text transition">Wishlist</button>
+      <div class="flex items-center gap-1 p-1 bg-cocoa-input rounded-xl border border-cocoa-border w-full sm:w-auto text-xs font-semibold overflow-x-auto">
+        <button onclick="setFilter('all')" id="filter-all" class="filter-btn flex-1 sm:flex-initial px-3 py-1.5 rounded-lg bg-cocoa-card text-cocoa-text shadow-sm transition whitespace-nowrap">All</button>
+        <button onclick="setFilter('reading')" id="filter-reading" class="filter-btn flex-1 sm:flex-initial px-3 py-1.5 rounded-lg text-cocoa-muted hover:text-cocoa-text transition whitespace-nowrap">Reading</button>
+        <button onclick="setFilter('completed')" id="filter-completed" class="filter-btn flex-1 sm:flex-initial px-3 py-1.5 rounded-lg text-cocoa-muted hover:text-cocoa-text transition whitespace-nowrap">Finished</button>
+        <button onclick="setFilter('wishlist')" id="filter-wishlist" class="filter-btn flex-1 sm:flex-initial px-3 py-1.5 rounded-lg text-cocoa-muted hover:text-cocoa-text transition whitespace-nowrap">Wishlist</button>
       </div>
       <div class="relative w-full sm:w-72">
         <i data-lucide="search" class="w-4 h-4 text-cocoa-muted absolute left-3 top-1/2 -translate-y-1/2"></i>
@@ -165,7 +165,7 @@
     </div>
 
     <!-- BOOKS GRID -->
-    <div id="books-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"></div>
+    <div id="books-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5"></div>
 
     <!-- EMPTY STATE -->
     <div id="empty-state" class="hidden flex-col items-center justify-center py-16 text-center">
