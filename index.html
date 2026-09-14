@@ -10,6 +10,8 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <!-- SUPABASE JS SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     tailwind.config = {
       theme: {
@@ -29,21 +31,24 @@
 </head>
 <body class="bg-cocoa-bg text-cocoa-text font-sans min-h-screen pb-20 antialiased selection:bg-brand-600 selection:text-white">
 
-  <!-- NAVBAR DENGAN SAFE AREA & HEADER ANTI-TERPOTONG -->
+  <!-- NAVBAR DENGAN SAFE-AREA & CLOUD STATUS -->
   <header class="sticky top-0 z-40 backdrop-blur-md bg-cocoa-header/90 border-b border-cocoa-border pt-[max(0.6rem,env(safe-area-inset-top))] pb-2 sm:pb-0 transition-all">
     <div class="max-w-6xl mx-auto px-3.5 sm:px-6 min-h-[3.75rem] sm:min-h-[4.25rem] flex items-center justify-between gap-2">
-      <!-- LOGO & BRAND TITLE (TIDAK AKAN TERPOTONG) -->
+      <!-- LOGO & BRAND TITLE -->
       <div class="flex items-center gap-2 sm:gap-3 flex-shrink-0">
         <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-brand-600 via-brand-700 to-bronze-500 flex items-center justify-center text-white shadow-lg shadow-brand-600/20 flex-shrink-0">
           <i data-lucide="book-open-check" class="w-4 h-4 sm:w-5 sm:h-5"></i>
         </div>
         <div class="flex flex-col">
-          <h1 class="font-extrabold text-base sm:text-lg tracking-tight text-cocoa-text leading-none whitespace-nowrap">bacalagii</h1>
-          <p class="text-[10px] sm:text-[11px] text-cocoa-muted mt-1 font-medium whitespace-nowrap">One book, one step closer</p>
+          <div class="flex items-center gap-1.5">
+            <h1 class="font-extrabold text-base sm:text-lg tracking-tight text-cocoa-text leading-none whitespace-nowrap">bacalagii</h1>
+            <span id="cloud-status-badge" title="Checking Cloud Sync..." class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+          </div>
+          <p class="text-[10px] sm:text-[11px] text-cocoa-muted mt-0.5 font-medium whitespace-nowrap">One book, one step closer</p>
         </div>
       </div>
 
-      <!-- CONTROLS HEADER (OPTIMAL UNTUK MOBILE) -->
+      <!-- CONTROLS HEADER -->
       <div class="flex items-center gap-1.5 sm:gap-2.5 flex-shrink-0">
         <!-- CUSTOM YEAR FILTER DROPDOWN -->
         <div class="relative" id="year-dropdown-container">
@@ -323,6 +328,16 @@
 
   <script>
     const APP_STORAGE_KEY = 'bacalagii_platform_data_v2';
+    const STORE_ROW_ID = 'shared_data';
+
+    // SUPABASE CONFIG
+    const SUPABASE_URL = 'https://inesaulfeduudqdsbxux.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImluZXNhdWxmZWR1dWRxZHNieHV4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkzNjA2NTMsImV4cCI6MjEwNDkzNjY1M30.hlNGCUUaI_PLkgqM6Dtbf8Thkq54ltfIN_3KaEuqqFQ';
+
+    let supabaseClient = null;
+    if (window.supabase) {
+      supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    }
     
     let appState = { 
       activeUserId: 'user_1', 
@@ -365,21 +380,111 @@
     let currentFilter = 'all';
     let searchQuery = '';
 
-    function init() {
+    function updateCloudIndicator(status) {
+      const badge = document.getElementById('cloud-status-badge');
+      if (!badge) return;
+      badge.className = 'w-2 h-2 rounded-full transition-colors duration-300';
+      if (status === 'connected') {
+        badge.classList.add('bg-emerald-400');
+        badge.title = 'Cloud Synced across devices';
+      } else if (status === 'syncing') {
+        badge.classList.add('bg-sky-400', 'animate-pulse');
+        badge.title = 'Syncing...';
+      } else {
+        badge.classList.add('bg-amber-400');
+        badge.title = 'Offline / Local storage';
+      }
+    }
+
+    async function init() {
+      // 1. Muat dari local storage dulu agar tampil cepat
       const saved = localStorage.getItem(APP_STORAGE_KEY) || localStorage.getItem('bacalagi_platform_data_v2');
       if (saved) {
         try {
           appState = JSON.parse(saved);
           if (!appState.selectedYear) appState.selectedYear = '2026';
         } catch (e) {}
-      } else {
-        saveData();
       }
       renderAll();
+
+      // 2. Muat data terbaru dari Supabase Cloud
+      if (supabaseClient) {
+        updateCloudIndicator('syncing');
+        try {
+          const { data, error } = await supabaseClient
+            .from('bacalagii_store')
+            .select('data')
+            .eq('id', STORE_ROW_ID)
+            .maybeSingle();
+
+          if (data && data.data) {
+            appState = data.data;
+            localStorage.setItem(APP_STORAGE_KEY, JSON.stringify(appState));
+            renderAll();
+            updateCloudIndicator('connected');
+          } else if (!error) {
+            await supabaseClient.from('bacalagii_store').upsert({
+              id: STORE_ROW_ID,
+              data: appState,
+              updated_at: new Date().toISOString()
+            });
+            updateCloudIndicator('connected');
+          } else {
+            console.warn('Supabase info:', error.message);
+            updateCloudIndicator('local');
+          }
+        } catch (err) {
+          console.error('Supabase load error:', err);
+          updateCloudIndicator('local');
+        }
+
+        // 3. Listener Realtime
+        try {
+          supabaseClient
+            .channel('bacalagii_realtime_changes')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'bacalagii_store' }, (payload) => {
+              if (payload.new && payload.new.data) {
+                appState = payload.new.data;
+                localStorage.setItem(APP_STORAGE_KEY, JSON.stringify(appState));
+                renderAll();
+                updateCloudIndicator('connected');
+              }
+            })
+            .subscribe((status) => {
+              if (status === 'SUBSCRIBED') {
+                updateCloudIndicator('connected');
+              }
+            });
+        } catch (rtErr) {
+          console.warn('Realtime subscription error:', rtErr);
+        }
+      } else {
+        updateCloudIndicator('local');
+      }
     }
 
-    function saveData() {
+    async function saveData() {
       localStorage.setItem(APP_STORAGE_KEY, JSON.stringify(appState));
+      
+      if (supabaseClient) {
+        updateCloudIndicator('syncing');
+        try {
+          const { error } = await supabaseClient.from('bacalagii_store').upsert({
+            id: STORE_ROW_ID,
+            data: appState,
+            updated_at: new Date().toISOString()
+          });
+          if (!error) {
+            updateCloudIndicator('connected');
+          } else {
+            console.warn('Supabase save error:', error.message);
+            updateCloudIndicator('local');
+          }
+        } catch (e) {
+          console.error('Failed to sync to Supabase:', e);
+          updateCloudIndicator('local');
+        }
+      }
     }
 
     function getCurrentUser() {
